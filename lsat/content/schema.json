@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oshikanoma/lsat_app/lsat/content/schema.json",
+  "title": "LSAT Speedrun content schema",
+  "description": "Canonical format for LSAT practice content. Used both to bundle the original starter bank and as the import format for user-supplied content. Every record MUST carry honest provenance.",
+  "type": "object",
+  "required": ["section", "version", "items"],
+  "properties": {
+    "section": {
+      "enum": ["LR", "RC", "VOCAB", "WRITING"],
+      "description": "LR = Logical Reasoning, RC = Reading Comprehension, VOCAB = Word of the Day, WRITING = Argumentative Writing (unscored)."
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } }
+  },
+  "$defs": {
+    "provenance": {
+      "enum": ["original", "user-imported", "synthetic", "licensed"],
+      "description": "original = authored for this project (safe to bundle); user-imported = supplied by the end user, never redistributed; synthetic = AI-generated under the project's AI rules; licensed = used under an explicit license (e.g. LSAC). The shippable / AI-off build uses only 'original' + 'user-imported'."
+    },
+    "choice": {
+      "type": "object",
+      "description": "Answer choices keyed by letter, e.g. {\"A\": \"...\", \"B\": \"...\"}.",
+      "patternProperties": { "^[A-E]$": { "type": "string" } },
+      "minProperties": 2,
+      "additionalProperties": false
+    },
+    "mcq": {
+      "type": "object",
+      "required": ["stem", "choices", "answer"],
+      "properties": {
+        "stem": { "type": "string" },
+        "choices": { "$ref": "#/$defs/choice" },
+        "answer": { "type": "string", "pattern": "^[A-E]$" },
+        "explanation": { "type": "string" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "section", "provenance", "source"],
+      "properties": {
+        "id": { "type": "string", "description": "Stable unique id, e.g. lr-0001." },
+        "section": { "enum": ["LR", "RC", "VOCAB", "WRITING"] },
+        "question_type": { "type": "string", "description": "For LR: Weaken, Strengthen, Necessary Assumption, Flaw, Inference, Resolve/Explain, Principle, etc. For RC questions: Main Point, Inference, Detail, Function, Attitude, etc." },
+        "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "skill_tags": { "type": "array", "items": { "type": "string" } },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "source": { "type": "string", "description": "Human-readable attribution string." },
+
+        "stimulus": { "type": "string", "description": "LR: the argument/stimulus." },
+        "stem": { "type": "string", "description": "The question stem." },
+        "choices": { "$ref": "#/$defs/choice" },
+        "answer": { "type": "string", "pattern": "^[A-E]$" },
+        "explanation": { "type": "string" },
+
+        "topic": { "type": "string", "description": "RC: humanities | social science | natural science | law." },
+        "passage": { "type": "string", "description": "RC: the full passage text." },
+        "questions": { "type": "array", "items": { "$ref": "#/$defs/item" }, "description": "RC: questions attached to a passage." },
+
+        "word": { "type": "string", "description": "VOCAB: the headword." },
+        "part_of_speech": { "type": "string" },
+        "definition": { "type": "string" },
+        "example": { "type": "string" },
+        "context_question": { "$ref": "#/$defs/mcq" }
+      }
+    }
+  }
+}

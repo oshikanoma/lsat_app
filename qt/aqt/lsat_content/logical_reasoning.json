@@ -1,0 +1,126 @@
+{
+  "section": "LR",
+  "version": 1,
+  "items": [
+    {
+      "id": "lr-0001",
+      "section": "LR",
+      "question_type": "Weaken",
+      "difficulty": 2,
+      "skill_tags": ["causal-reasoning", "reverse-causation"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "A recent survey of office workers found that those who keep a small plant on their desk report noticeably lower stress levels than those who do not. The researchers concluded that keeping a plant on one's desk reduces a worker's stress.",
+      "stem": "Which one of the following, if true, most weakens the researchers' argument?",
+      "choices": {
+        "A": "A few of the workers surveyed were unable to identify the specific type of plant on their desk.",
+        "B": "Workers who already feel relatively calm at work are more inclined than other workers to decorate their desks with plants.",
+        "C": "The survey included workers from a wide range of industries and job types.",
+        "D": "Most of the plants kept on workers' desks require only minimal watering and care.",
+        "E": "Workers who keep a plant on their desk also tend to keep framed photographs on their desk."
+      },
+      "answer": "B",
+      "explanation": "The argument infers causation (plant causes lower stress) from a mere correlation. (B) supplies the reverse explanation: being less stressed leads workers to keep plants, not the other way around, which undercuts the causal claim. (A), (C), (D), and (E) are irrelevant to the direction of causation."
+    },
+    {
+      "id": "lr-0002",
+      "section": "LR",
+      "question_type": "Necessary Assumption",
+      "difficulty": 3,
+      "skill_tags": ["conditional-reasoning", "sufficient-vs-necessary"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Northfield Tools will meet its annual revenue goal only if its new drill launches in March. Whether the drill launches in March depends entirely on the design team finishing safety testing by the end of February, and the design team has never once missed a deadline. Therefore, Northfield Tools will meet its annual revenue goal this year.",
+      "stem": "The argument depends on assuming which one of the following?",
+      "choices": {
+        "A": "The design team will finish the safety testing well before the end of February.",
+        "B": "No factor other than a delayed launch of the new drill will prevent Northfield Tools from meeting its annual revenue goal.",
+        "C": "The new drill is the only product that Northfield Tools plans to launch this year.",
+        "D": "If the design team finishes safety testing on time, the new drill will be Northfield Tools' best-selling product.",
+        "E": "Northfield Tools has met its annual revenue goal in most previous years."
+      },
+      "answer": "B",
+      "explanation": "An on-time March launch is stated only as a necessary condition for meeting the goal ('only if'). The argument shows the launch will happen, then concludes the goal WILL be met, which treats the launch as sufficient. That leap requires assuming nothing else will block the goal (B). Negate (B) and the conclusion collapses, the signature of a necessary assumption. (A) is stronger than needed; (C), (D), and (E) are not required."
+    },
+    {
+      "id": "lr-0003",
+      "section": "LR",
+      "question_type": "Flaw",
+      "difficulty": 2,
+      "skill_tags": ["causal-reasoning", "correlation-causation"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Every successful entrepreneur I have interviewed for my podcast wakes up before 6 a.m. The conclusion is obvious: waking up before 6 a.m. is what makes these entrepreneurs successful.",
+      "stem": "The reasoning above is most vulnerable to criticism on the grounds that it",
+      "choices": {
+        "A": "draws a conclusion about all entrepreneurs based only on those who have appeared on a podcast",
+        "B": "treats a characteristic shared by successful people as the cause of their success, without ruling out other explanations",
+        "C": "assumes that waking up early is unpleasant for most people",
+        "D": "fails to provide a precise definition of what counts as a successful entrepreneur",
+        "E": "presumes, without justification, that anyone who wakes up after 6 a.m. cannot become a successful entrepreneur"
+      },
+      "answer": "B",
+      "explanation": "The argument leaps from a correlation (these successful entrepreneurs happen to wake early) to a causal claim (waking early causes their success) without excluding other causes or reverse causation. That is the central flaw (B). The conclusion is limited to 'these entrepreneurs,' so (A) misdescribes it; (C), (D), and (E) identify things the argument never assumes."
+    },
+    {
+      "id": "lr-0004",
+      "section": "LR",
+      "question_type": "Inference",
+      "difficulty": 1,
+      "skill_tags": ["conditional-reasoning", "must-be-true"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Everyone on the debate team is an honor student. No honor student is permitted to miss the year-end assembly. Rosa is on the debate team.",
+      "stem": "If the statements above are true, which one of the following must also be true?",
+      "choices": {
+        "A": "Rosa is permitted to miss the year-end assembly.",
+        "B": "Rosa is not permitted to miss the year-end assembly.",
+        "C": "Every honor student is on the debate team.",
+        "D": "Some honor students are not on the debate team.",
+        "E": "Rosa is the only member of the debate team who is an honor student."
+      },
+      "answer": "B",
+      "explanation": "Debate team implies honor student, so Rosa is an honor student. Honor student implies not permitted to miss the assembly. Therefore Rosa is not permitted to miss it (B). (A) contradicts this; (C) illicitly reverses the first conditional; (D) and (E) are unsupported."
+    },
+    {
+      "id": "lr-0005",
+      "section": "LR",
+      "question_type": "Resolve/Explain",
+      "difficulty": 2,
+      "skill_tags": ["paradox", "reporting-vs-occurrence"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "After the city replaced the dim streetlights downtown with much brighter ones, the number of reported nighttime thefts in the area rose sharply over the following year. This is surprising, since better street lighting is widely believed to discourage crime.",
+      "stem": "Which one of the following, if true, most helps to resolve the apparent discrepancy described above?",
+      "choices": {
+        "A": "The brighter streetlights consumed considerably more electricity than the dim ones they replaced.",
+        "B": "Before the lighting was improved, many nighttime thefts downtown went unnoticed and unreported, but the brighter lighting made such thefts far more likely to be seen and reported.",
+        "C": "Crime rates in nearby neighborhoods that kept their dim lighting remained roughly unchanged over the same period.",
+        "D": "The city installed the brighter lighting partly in response to complaints from downtown business owners.",
+        "E": "Most thefts that occur downtown take place during daytime business hours rather than at night."
+      },
+      "answer": "B",
+      "explanation": "The puzzle is brighter lights together with more REPORTED thefts. (B) dissolves it: the lights need not have increased theft; they increased detection and reporting of thefts that previously went unrecorded. (A), (C), and (D) do not explain the rise, and (E) is irrelevant to the change in nighttime reports."
+    },
+    {
+      "id": "lr-0006",
+      "section": "LR",
+      "question_type": "Principle",
+      "difficulty": 3,
+      "skill_tags": ["principle-application", "conditional-exception"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Principle: A person should keep a promise unless keeping it would require seriously harming an innocent person.",
+      "stem": "Which one of the following judgments conforms most closely to the principle stated above?",
+      "choices": {
+        "A": "Leah promised to drive her neighbor to the airport but canceled at the last minute because she received a more appealing invitation; her decision was acceptable.",
+        "B": "Marcus promised to lend his truck to a friend but refused once he learned that the friend intended to use it to run down a rival; his refusal was acceptable.",
+        "C": "Priya broke her promise to keep a coworker's minor mistake confidential, even though disclosing it harmed no one and merely embarrassed the coworker; her decision was acceptable.",
+        "D": "Devon broke his promise to repay a small loan on time because repaying it then would have been mildly inconvenient; his decision was acceptable.",
+        "E": "Sara promised to attend her sister's recital but skipped it in order to study for an exam she felt prepared for; her decision was acceptable."
+      },
+      "answer": "B",
+      "explanation": "The principle permits breaking a promise precisely when keeping it would seriously harm an innocent person. (B) fits exactly: keeping the promise would enable serious harm to an innocent person, so breaking it is acceptable. (A), (C), (D), and (E) all judge promise-breaking acceptable in the absence of any serious-harm justification, which the principle does not allow."
+    }
+  ]
+}

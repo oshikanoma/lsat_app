@@ -1,0 +1,366 @@
+{
+  "section": "LR",
+  "version": 1,
+  "items": [
+    {
+      "id": "lr-0001",
+      "section": "LR",
+      "question_type": "Weaken",
+      "difficulty": 2,
+      "skill_tags": ["causal-reasoning", "reverse-causation"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "A recent survey of office workers found that those who keep a small plant on their desk report noticeably lower stress levels than those who do not. The researchers concluded that keeping a plant on one's desk reduces a worker's stress.",
+      "stem": "Which one of the following, if true, most weakens the researchers' argument?",
+      "choices": {
+        "A": "A few of the workers surveyed were unable to identify the specific type of plant on their desk.",
+        "B": "Workers who already feel relatively calm at work are more inclined than other workers to decorate their desks with plants.",
+        "C": "The survey included workers from a wide range of industries and job types.",
+        "D": "Most of the plants kept on workers' desks require only minimal watering and care.",
+        "E": "Workers who keep a plant on their desk also tend to keep framed photographs on their desk."
+      },
+      "answer": "B",
+      "explanation": "The argument infers causation (plant causes lower stress) from a mere correlation. (B) supplies the reverse explanation: being less stressed leads workers to keep plants, not the other way around, which undercuts the causal claim. (A), (C), (D), and (E) are irrelevant to the direction of causation."
+    },
+    {
+      "id": "lr-0002",
+      "section": "LR",
+      "question_type": "Necessary Assumption",
+      "difficulty": 3,
+      "skill_tags": ["conditional-reasoning", "sufficient-vs-necessary"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Northfield Tools will meet its annual revenue goal only if its new drill launches in March. Whether the drill launches in March depends entirely on the design team finishing safety testing by the end of February, and the design team has never once missed a deadline. Therefore, Northfield Tools will meet its annual revenue goal this year.",
+      "stem": "The argument depends on assuming which one of the following?",
+      "choices": {
+        "A": "The design team will finish the safety testing well before the end of February.",
+        "B": "No factor other than a delayed launch of the new drill will prevent Northfield Tools from meeting its annual revenue goal.",
+        "C": "The new drill is the only product that Northfield Tools plans to launch this year.",
+        "D": "If the design team finishes safety testing on time, the new drill will be Northfield Tools' best-selling product.",
+        "E": "Northfield Tools has met its annual revenue goal in most previous years."
+      },
+      "answer": "B",
+      "explanation": "An on-time March launch is stated only as a necessary condition for meeting the goal ('only if'). The argument shows the launch will happen, then concludes the goal WILL be met, which treats the launch as sufficient. That leap requires assuming nothing else will block the goal (B). Negate (B) and the conclusion collapses, the signature of a necessary assumption. (A) is stronger than needed; (C), (D), and (E) are not required."
+    },
+    {
+      "id": "lr-0003",
+      "section": "LR",
+      "question_type": "Flaw",
+      "difficulty": 2,
+      "skill_tags": ["causal-reasoning", "correlation-causation"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Every successful entrepreneur I have interviewed for my podcast wakes up before 6 a.m. The conclusion is obvious: waking up before 6 a.m. is what makes these entrepreneurs successful.",
+      "stem": "The reasoning above is most vulnerable to criticism on the grounds that it",
+      "choices": {
+        "A": "draws a conclusion about all entrepreneurs based only on those who have appeared on a podcast",
+        "B": "treats a characteristic shared by successful people as the cause of their success, without ruling out other explanations",
+        "C": "assumes that waking up early is unpleasant for most people",
+        "D": "fails to provide a precise definition of what counts as a successful entrepreneur",
+        "E": "presumes, without justification, that anyone who wakes up after 6 a.m. cannot become a successful entrepreneur"
+      },
+      "answer": "B",
+      "explanation": "The argument leaps from a correlation (these successful entrepreneurs happen to wake early) to a causal claim (waking early causes their success) without excluding other causes or reverse causation. That is the central flaw (B). The conclusion is limited to 'these entrepreneurs,' so (A) misdescribes it; (C), (D), and (E) identify things the argument never assumes."
+    },
+    {
+      "id": "lr-0004",
+      "section": "LR",
+      "question_type": "Inference",
+      "difficulty": 1,
+      "skill_tags": ["conditional-reasoning", "must-be-true"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Everyone on the debate team is an honor student. No honor student is permitted to miss the year-end assembly. Rosa is on the debate team.",
+      "stem": "If the statements above are true, which one of the following must also be true?",
+      "choices": {
+        "A": "Rosa is permitted to miss the year-end assembly.",
+        "B": "Rosa is not permitted to miss the year-end assembly.",
+        "C": "Every honor student is on the debate team.",
+        "D": "Some honor students are not on the debate team.",
+        "E": "Rosa is the only member of the debate team who is an honor student."
+      },
+      "answer": "B",
+      "explanation": "Debate team implies honor student, so Rosa is an honor student. Honor student implies not permitted to miss the assembly. Therefore Rosa is not permitted to miss it (B). (A) contradicts this; (C) illicitly reverses the first conditional; (D) and (E) are unsupported."
+    },
+    {
+      "id": "lr-0005",
+      "section": "LR",
+      "question_type": "Resolve/Explain",
+      "difficulty": 2,
+      "skill_tags": ["paradox", "reporting-vs-occurrence"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "After the city replaced the dim streetlights downtown with much brighter ones, the number of reported nighttime thefts in the area rose sharply over the following year. This is surprising, since better street lighting is widely believed to discourage crime.",
+      "stem": "Which one of the following, if true, most helps to resolve the apparent discrepancy described above?",
+      "choices": {
+        "A": "The brighter streetlights consumed considerably more electricity than the dim ones they replaced.",
+        "B": "Before the lighting was improved, many nighttime thefts downtown went unnoticed and unreported, but the brighter lighting made such thefts far more likely to be seen and reported.",
+        "C": "Crime rates in nearby neighborhoods that kept their dim lighting remained roughly unchanged over the same period.",
+        "D": "The city installed the brighter lighting partly in response to complaints from downtown business owners.",
+        "E": "Most thefts that occur downtown take place during daytime business hours rather than at night."
+      },
+      "answer": "B",
+      "explanation": "The puzzle is brighter lights together with more REPORTED thefts. (B) dissolves it: the lights need not have increased theft; they increased detection and reporting of thefts that previously went unrecorded. (A), (C), and (D) do not explain the rise, and (E) is irrelevant to the change in nighttime reports."
+    },
+    {
+      "id": "lr-0006",
+      "section": "LR",
+      "question_type": "Principle",
+      "difficulty": 3,
+      "skill_tags": ["principle-application", "conditional-exception"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Principle: A person should keep a promise unless keeping it would require seriously harming an innocent person.",
+      "stem": "Which one of the following judgments conforms most closely to the principle stated above?",
+      "choices": {
+        "A": "Leah promised to drive her neighbor to the airport but canceled at the last minute because she received a more appealing invitation; her decision was acceptable.",
+        "B": "Marcus promised to lend his truck to a friend but refused once he learned that the friend intended to use it to run down a rival; his refusal was acceptable.",
+        "C": "Priya broke her promise to keep a coworker's minor mistake confidential, even though disclosing it harmed no one and merely embarrassed the coworker; her decision was acceptable.",
+        "D": "Devon broke his promise to repay a small loan on time because repaying it then would have been mildly inconvenient; his decision was acceptable.",
+        "E": "Sara promised to attend her sister's recital but skipped it in order to study for an exam she felt prepared for; her decision was acceptable."
+      },
+      "answer": "B",
+      "explanation": "The principle permits breaking a promise precisely when keeping it would seriously harm an innocent person. (B) fits exactly: keeping the promise would enable serious harm to an innocent person, so breaking it is acceptable. (A), (C), (D), and (E) all judge promise-breaking acceptable in the absence of any serious-harm justification, which the principle does not allow."
+    },
+    {
+      "id": "lr-0007",
+      "section": "LR",
+      "question_type": "Strengthen",
+      "difficulty": 2,
+      "skill_tags": ["causal-reasoning", "strengthen"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "In a small town, a bakery began playing soft classical music in its seating area. Over the next two months, the average amount of time customers spent in the bakery increased noticeably. The owner concluded that the music caused customers to linger longer.",
+      "stem": "Which one of the following, if true, most strengthens the owner's conclusion?",
+      "choices": {
+        "A": "The bakery introduced several new pastries during the same two-month period.",
+        "B": "During the two months, the number of customers visiting the bakery stayed about the same as before.",
+        "C": "A nearby cafe that plays no music reported no change in how long its customers stayed during the same period, and the bakery made no other changes.",
+        "D": "Some customers said they enjoyed the classical music more than the pop music played elsewhere in town.",
+        "E": "The bakery's seating area can accommodate up to twenty customers at a time."
+      },
+      "answer": "C",
+      "explanation": "Strengthening a causal claim means ruling out alternative causes. (C) does this by holding a comparable business constant (no music, no change) while noting the bakery changed nothing else, isolating the music as the likely cause. (A) introduces a rival cause and weakens; (B), (D), and (E) are irrelevant to why customers stayed longer."
+    },
+    {
+      "id": "lr-0008",
+      "section": "LR",
+      "question_type": "Parallel Reasoning",
+      "difficulty": 4,
+      "skill_tags": ["conditional-reasoning", "parallel-structure"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "If a recipe calls for buttermilk, then it will not turn out well with regular milk. This muffin recipe turned out well. So this muffin recipe did not call for buttermilk.",
+      "stem": "Which one of the following arguments is most similar in its reasoning to the argument above?",
+      "choices": {
+        "A": "If the road is icy, the race is canceled. The race was canceled. So the road was icy.",
+        "B": "If a plant is a cactus, it needs little water. This plant is a cactus. So this plant needs little water.",
+        "C": "If a book is a first edition, it is valuable. This book is not valuable. So this book is not a first edition.",
+        "D": "If the alarm is set, it rings at dawn. The alarm did not ring at dawn. So the alarm rang later.",
+        "E": "If a student studies, the student passes. This student did not study. So this student did not pass."
+      },
+      "answer": "C",
+      "explanation": "The stimulus has the valid form: If P then not-Q; Q occurred (turned out well = not the bad outcome); therefore not-P. This is contrapositive reasoning (denying the consequent). (C) matches exactly: If first edition then valuable; not valuable; therefore not first edition. (A) affirms the consequent (invalid); (B) affirms the antecedent (valid but different structure); (D) and (E) do not match."
+    },
+    {
+      "id": "lr-0009",
+      "section": "LR",
+      "question_type": "Weaken",
+      "difficulty": 3,
+      "skill_tags": ["sampling", "representativeness"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "A national magazine mailed a questionnaire to its subscribers asking whether they preferred to read news in print or online. Of those who returned the questionnaire, 78 percent said they preferred print. The magazine concluded that most adults in the country prefer to read news in print.",
+      "stem": "Which one of the following, if true, most undermines the magazine's conclusion?",
+      "choices": {
+        "A": "The questionnaire also asked subscribers about their favorite sections of the magazine.",
+        "B": "People who subscribe to a print magazine and take the time to mail back a questionnaire are far more likely than the general public to favor print.",
+        "C": "A rival magazine conducted a similar survey and obtained similar results.",
+        "D": "Some subscribers who preferred online news did not understand the questionnaire.",
+        "E": "The magazine has subscribers in every region of the country."
+      },
+      "answer": "B",
+      "explanation": "The conclusion generalizes from an unrepresentative sample. (B) shows the respondents are doubly skewed toward print (they subscribe to print AND self-select by mailing it back), so they cannot support a claim about most adults. (C) if anything supports the claim; (A), (D), and (E) do not address the sampling bias."
+    },
+    {
+      "id": "lr-0010",
+      "section": "LR",
+      "question_type": "Inference",
+      "difficulty": 2,
+      "skill_tags": ["must-be-true", "quantifiers"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "All of the paintings in the east wing were made before 1900. Some of the paintings in the east wing depict ships. None of the paintings made before 1900 use synthetic pigments.",
+      "stem": "If the statements above are true, which one of the following must also be true?",
+      "choices": {
+        "A": "Some paintings that depict ships do not use synthetic pigments.",
+        "B": "All paintings that depict ships were made before 1900.",
+        "C": "No painting in the museum uses synthetic pigments.",
+        "D": "Every painting made before 1900 depicts ships.",
+        "E": "Some paintings that use synthetic pigments are in the east wing."
+      },
+      "answer": "A",
+      "explanation": "Some east-wing paintings depict ships; all east-wing paintings were made before 1900; nothing made before 1900 uses synthetic pigments. So those ship-depicting east-wing paintings were made before 1900 and thus lack synthetic pigments, yielding (A). (B), (C), and (D) overgeneralize beyond the east wing or reverse a relationship; (E) contradicts the premises."
+    },
+    {
+      "id": "lr-0011",
+      "section": "LR",
+      "question_type": "Method of Reasoning",
+      "difficulty": 3,
+      "skill_tags": ["argument-structure", "counterexample"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Columnist: My opponent claims that any policy that reduces unemployment is good for the country. But consider a policy that put people to work building weapons for a hostile invasion. That would reduce unemployment yet clearly harm the country. So my opponent's claim cannot be right.",
+      "stem": "The columnist's argument proceeds by",
+      "choices": {
+        "A": "attacking the opponent's character rather than the opponent's claim.",
+        "B": "presenting a hypothetical case in which the opponent's general claim leads to an unacceptable result.",
+        "C": "offering statistical evidence that unemployment policies usually fail.",
+        "D": "appealing to the authority of economic experts.",
+        "E": "redefining a key term so that the opponent's claim becomes trivially false."
+      },
+      "answer": "B",
+      "explanation": "The columnist refutes a universal claim ('any policy that reduces unemployment is good') by constructing a counterexample: a hypothetical unemployment-reducing policy that is plainly bad. That is the method in (B). (A), (C), (D), and (E) describe techniques the columnist does not use."
+    },
+    {
+      "id": "lr-0012",
+      "section": "LR",
+      "question_type": "Necessary Assumption",
+      "difficulty": 3,
+      "skill_tags": ["assumption", "gap"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "The new bridge will be safe for at least fifty years. After all, it was built using the same steel alloy used in the Larkspur Bridge, which has stood safely for over fifty years.",
+      "stem": "The argument depends on assuming which one of the following?",
+      "choices": {
+        "A": "The Larkspur Bridge will continue to stand safely for another fifty years.",
+        "B": "The new bridge carries the same amount of traffic as the Larkspur Bridge.",
+        "C": "No bridge can be safe for fifty years unless it is built from the same alloy as the Larkspur Bridge.",
+        "D": "The safety of a bridge over fifty years depends at least partly on factors that the shared steel alloy affects, and no other relevant difference undermines the comparison.",
+        "E": "The engineers who built the new bridge also built the Larkspur Bridge."
+      },
+      "answer": "D",
+      "explanation": "The argument infers the new bridge's fifty-year safety solely from a shared alloy. That inference requires that the alloy is actually relevant to such safety and that no other difference breaks the analogy (D); negate it and the comparison collapses. (A) concerns the old bridge's future, not needed; (B), (C), and (E) are not required by the argument."
+    },
+    {
+      "id": "lr-0013",
+      "section": "LR",
+      "question_type": "Flaw",
+      "difficulty": 3,
+      "skill_tags": ["equivocation", "ambiguity"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Everyone wants to be successful. And whatever everyone wants must be genuinely good for people. So being successful is genuinely good for people. Besides, a successful surgery is one that achieves its intended result, which is certainly good.",
+      "stem": "The argument is most vulnerable to criticism because it",
+      "choices": {
+        "A": "relies on the testimony of people who are not experts.",
+        "B": "uses the word 'successful' in two different senses as though they were the same.",
+        "C": "assumes that what is good for one person is good for everyone.",
+        "D": "concludes that something is impossible merely because it has never occurred.",
+        "E": "takes for granted that a whole has the properties of its parts."
+      },
+      "answer": "B",
+      "explanation": "The argument shifts between 'successful' meaning personally accomplished (what people want) and 'successful' meaning achieving an intended result (a successful surgery). Treating these distinct senses as one is equivocation (B). The other choices name flaws the argument does not commit."
+    },
+    {
+      "id": "lr-0014",
+      "section": "LR",
+      "question_type": "Resolve/Explain",
+      "difficulty": 2,
+      "skill_tags": ["paradox", "explain"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "A company switched from annual performance reviews to frequent informal check-ins, expecting employees to feel better supported. Yet in the year after the change, scores on the question 'I feel my work is recognized' actually declined.",
+      "stem": "Which one of the following, if true, most helps to explain the decline described above?",
+      "choices": {
+        "A": "Employees generally reported that they liked their managers.",
+        "B": "The informal check-ins replaced the formal written praise that employees had previously received and could point to during promotions.",
+        "C": "The company's overall revenue rose during the year after the change.",
+        "D": "Most employees had experienced annual reviews at previous jobs.",
+        "E": "The check-ins were scheduled at times convenient for managers."
+      },
+      "answer": "B",
+      "explanation": "We need something that makes recognition feel lower despite more frequent contact. (B) supplies it: the change removed durable, documentable praise employees valued, so perceived recognition fell. (A), (C), (D), and (E) do not explain a drop in feeling recognized."
+    },
+    {
+      "id": "lr-0015",
+      "section": "LR",
+      "question_type": "Principle",
+      "difficulty": 2,
+      "skill_tags": ["principle-identify", "justification"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Reviewer: This restaurant advertises its dishes as locally sourced, but most of its ingredients are shipped from overseas. Even though the food tastes excellent, I cannot give the restaurant a positive review, because it misleads its customers about something they care about.",
+      "stem": "Which one of the following principles, if valid, most helps to justify the reviewer's judgment?",
+      "choices": {
+        "A": "A restaurant should be reviewed positively only if its food tastes excellent.",
+        "B": "A business that deceives customers about a matter they consider important should not receive a favorable evaluation, regardless of the quality of its product.",
+        "C": "Reviewers should base their judgments primarily on the taste of the food.",
+        "D": "Customers should investigate the sourcing claims of restaurants before dining there.",
+        "E": "Locally sourced ingredients are always superior to imported ones."
+      },
+      "answer": "B",
+      "explanation": "The reviewer withholds a positive review specifically because of deception about something customers care about, despite excellent taste. (B) states exactly that principle and licenses the judgment. (A) and (C) would push toward a positive review; (D) and (E) do not justify the reviewer's reasoning."
+    },
+    {
+      "id": "lr-0016",
+      "section": "LR",
+      "question_type": "Weaken",
+      "difficulty": 3,
+      "skill_tags": ["causal-reasoning", "alternative-cause"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Students who took the new online study course scored higher on the certification exam, on average, than students who did not take it. Clearly, the online course is effective at improving exam performance.",
+      "stem": "Which one of the following, if true, most weakens the argument?",
+      "choices": {
+        "A": "The online course covers all the topics that appear on the certification exam.",
+        "B": "Enrollment in the online course was voluntary, and only the most motivated and well-prepared students chose to enroll.",
+        "C": "The certification exam is widely regarded as a fair measure of the relevant skills.",
+        "D": "Some students who did not take the online course still passed the exam.",
+        "E": "The online course is less expensive than an equivalent in-person course."
+      },
+      "answer": "B",
+      "explanation": "The argument assumes the course caused the higher scores. (B) offers an alternative cause: the enrollees were already more motivated and prepared, so their higher scores may reflect self-selection rather than the course. (A) and (C) tend to support the course; (D) and (E) are irrelevant to causation."
+    },
+    {
+      "id": "lr-0017",
+      "section": "LR",
+      "question_type": "Inference",
+      "difficulty": 2,
+      "skill_tags": ["most-strongly-supported", "detail"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Any medication that is sold without a prescription must have been judged safe for use without a doctor's supervision. The pain reliever Reliva is sold only with a prescription. The allergy tablet Claron is sold without a prescription.",
+      "stem": "The statements above, if true, most strongly support which one of the following?",
+      "choices": {
+        "A": "Reliva has not been judged safe for use without a doctor's supervision.",
+        "B": "Claron has been judged safe for use without a doctor's supervision.",
+        "C": "Claron is safer than Reliva.",
+        "D": "Reliva is more effective than Claron.",
+        "E": "Any medication judged safe without supervision is sold without a prescription."
+      },
+      "answer": "B",
+      "explanation": "The rule says: sold without a prescription implies judged safe without supervision. Claron is sold without a prescription, so it was judged safe without supervision (B). (A) reverses the conditional (prescription status doesn't entail the negation); (C) and (D) compare safety/efficacy not given; (E) illicitly reverses the rule."
+    },
+    {
+      "id": "lr-0018",
+      "section": "LR",
+      "question_type": "Point at Issue",
+      "difficulty": 3,
+      "skill_tags": ["dialogue", "disagreement"],
+      "provenance": "original",
+      "source": "LSAT Speedrun original content",
+      "stimulus": "Mara: Cities should invest in public libraries, because a library gives everyone, regardless of income, free access to information and a quiet place to work. Devin: But most people now get their information from the internet, and libraries are expensive to maintain. That money would do more good if spent on public transit.",
+      "stem": "Mara and Devin disagree over whether",
+      "choices": {
+        "A": "public libraries provide free access to information.",
+        "B": "cities should prioritize spending money on public libraries.",
+        "C": "public transit is expensive to maintain.",
+        "D": "most people get their information from the internet.",
+        "E": "a quiet place to work is valuable."
+      },
+      "answer": "B",
+      "explanation": "Mara argues cities should invest in libraries; Devin argues the money would do more good elsewhere, opposing that priority. Their disagreement is over (B). (A) is something Devin doesn't dispute; (C), (D), and (E) are raised by only one speaker or not contested."
+    }
+  ]
+}

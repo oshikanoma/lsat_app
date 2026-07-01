@@ -16,6 +16,7 @@ from anki import (
     image_occlusion_pb2,
     import_export_pb2,
     links_pb2,
+    lsat_pb2,
     notes_pb2,
     scheduler_pb2,
     search_pb2,
@@ -32,6 +33,7 @@ Progress = collection_pb2.Progress
 EmptyCardsReport = card_rendering_pb2.EmptyCardsReport
 GraphPreferences = stats_pb2.GraphPreferences
 CardStats = stats_pb2.CardStatsResponse
+LsatReadiness = lsat_pb2.ReadinessResponse
 Preferences = config_pb2.Preferences
 UndoStatus = collection_pb2.UndoStatus
 OpChanges = collection_pb2.OpChanges
@@ -1027,6 +1029,18 @@ class Collection(DeprecatedNamesMixin):
 
     def studied_today(self) -> str:
         return self._backend.studied_today()
+
+    # LSAT Speedrun
+    ##########################################################################
+
+    def lsat_readiness(self) -> lsat_pb2.ReadinessResponse:
+        """The three honest LSAT scores (memory / performance / readiness).
+
+        Each score carries a likely range and an `available` flag; per the
+        honesty rule, a score is only shown when `available` is true. Computed
+        in the shared Rust engine, so desktop and mobile get the same numbers.
+        """
+        return self._backend.get_readiness()
 
     # Undo
     ##########################################################################

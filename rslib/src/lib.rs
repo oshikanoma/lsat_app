@@ -24,6 +24,7 @@ pub mod import_export;
 pub mod latex;
 pub mod links;
 pub mod log;
+pub mod lsat;
 mod markdown;
 pub mod media;
 pub mod notes;

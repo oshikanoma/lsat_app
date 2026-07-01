@@ -422,6 +422,10 @@ def is_sveltekit_page(path: str) -> bool:
         "import-csv",
         "import-page",
         "image-occlusion",
+        "lsat-home",
+        "lsat-practice",
+        "lsat-review",
+        "lsat-socratic",
     ]
 
 
@@ -765,6 +769,8 @@ exposed_backend_list = [
     # DeckConfigService
     "get_ignored_before_count",
     "get_retention_workload",
+    # LsatService
+    "get_readiness",
 ]
 
 

@@ -372,6 +372,13 @@ class Toolbar:
                 tip=tr.actions_shortcut_key(val="T"),
                 id="stats",
             ),
+            self.create_link(
+                "lsat",
+                "LSAT",
+                self._lsatLinkHandler,
+                tip="Open the LSAT home screen",
+                id="lsat",
+            ),
         ]
 
         links.append(self._create_sync_link())
@@ -449,6 +456,9 @@ class Toolbar:
 
     def _statsLinkHandler(self) -> None:
         self.mw.onStats()
+
+    def _lsatLinkHandler(self) -> None:
+        self.mw.onLsatHome()
 
     def _syncLinkHandler(self) -> None:
         self.mw.on_sync_button_clicked()

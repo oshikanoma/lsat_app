@@ -1,0 +1,59 @@
+// Copyright: Ankitects Pty Ltd and contributors
+// License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
+// LSAT Speedrun: a real change inside Anki's Rust engine.
+// Exposes the three separate scores (Memory / Performance / Readiness), each
+// with an honest range and a "refuse to score when there isn't enough data"
+// rule, to every client (desktop + mobile) through the shared backend.
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+
+package anki.lsat;
+
+service LsatService {
+  rpc GetReadiness(GetReadinessRequest) returns (ReadinessResponse);
+}
+
+// Implicitly includes any of the above methods that are not listed in the
+// backend service.
+service BackendLsatService {}
+
+message GetReadinessRequest {}
+
+// A single honest score. Per the project's honesty rule, a score is only shown
+// when `available` is true; otherwise `reasons` explains what is missing.
+message LsatScore {
+  // Whether enough data exists to show this score (the give-up rule).
+  bool available = 1;
+  // Point estimate. For memory/performance this is a probability in 0..1.
+  // For readiness this is on the real LSAT scale (120..180).
+  double estimate = 2;
+  // Lower bound of the likely range (same units as `estimate`).
+  double low = 3;
+  // Upper bound of the likely range (same units as `estimate`).
+  double high = 4;
+  // How confident the engine is in this number, 0..1.
+  double confidence = 5;
+  // Number of data points (cards/questions/reviews) the estimate is based on.
+  uint32 sample_size = 6;
+  // Human-readable evidence / reasons behind the number (or why it is hidden).
+  repeated string reasons = 7;
+}
+
+message ReadinessResponse {
+  LsatScore memory = 1;
+  LsatScore performance = 2;
+  LsatScore readiness = 3;
+  // Total graded reviews observed in the collection's review log.
+  uint32 graded_reviews = 4;
+  // Fraction of the exam's question-type taxonomy covered so far, 0..1.
+  double topic_coverage = 5;
+  // When these numbers were computed (unix seconds).
+  int64 last_updated = 6;
+  // The single best next thing to study.
+  string next_best_step = 7;
+  // What data is still missing before a full readiness score can be shown.
+  repeated string missing_data = 8;
+}

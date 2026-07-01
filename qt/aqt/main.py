@@ -83,7 +83,16 @@ from aqt.webview import AnkiWebView, AnkiWebViewKind
 install_pylib_legacy()
 
 MainWindowState = Literal[
-    "startup", "deckBrowser", "overview", "review", "resetRequired", "profileManager"
+    "startup",
+    "deckBrowser",
+    "overview",
+    "review",
+    "resetRequired",
+    "profileManager",
+    "lsatHome",
+    "lsatPractice",
+    "lsatReview",
+    "lsatSocratic",
 ]
 
 
@@ -662,7 +671,7 @@ class AnkiQt(QMainWindow):
             self.update_undo_actions()
             gui_hooks.collection_did_load(self.col)
             self.apply_collection_options()
-            self.moveToState("deckBrowser")
+            self.moveToState("lsatHome")
         except Exception:
             # dump error to stderr so it gets picked up by errors.py
             traceback.print_exc()
@@ -771,6 +780,36 @@ class AnkiQt(QMainWindow):
 
     def _deckBrowserState(self, oldState: MainWindowState) -> None:
         self.deckBrowser.show()
+
+    def _lsatHomeState(self, oldState: MainWindowState) -> None:
+        from aqt.lsat import LsatHome
+
+        if not getattr(self, "lsat_home", None):
+            self.lsat_home = LsatHome(self)
+        self.lsat_home.show()
+
+    def _lsatPracticeState(
+        self, oldState: MainWindowState, section: str = "lr"
+    ) -> None:
+        from aqt.lsat import LsatPractice
+
+        if not getattr(self, "lsat_practice", None):
+            self.lsat_practice = LsatPractice(self)
+        self.lsat_practice.show(section)
+
+    def _lsatReviewState(self, oldState: MainWindowState) -> None:
+        from aqt.lsat import LsatVocabReview
+
+        if not getattr(self, "lsat_review", None):
+            self.lsat_review = LsatVocabReview(self)
+        self.lsat_review.show()
+
+    def _lsatSocraticState(self, oldState: MainWindowState) -> None:
+        from aqt.lsat import LsatSocratic
+
+        if not getattr(self, "lsat_socratic", None):
+            self.lsat_socratic = LsatSocratic(self)
+        self.lsat_socratic.show()
 
     def _selectedDeck(self) -> DeckDict | None:
         did = self.col.decks.selected()
@@ -964,6 +1003,13 @@ title="{}" {}>{}</button>""".format(
         self.mainLayout.addWidget(self.web)
         self.mainLayout.addWidget(sweb)
         self.form.centralwidget.setLayout(self.mainLayout)
+
+        # homebase.: this is the LSAT prep app, which opens straight to the LSAT
+        # home screen. Permanently hide the top toolbar (Decks / Add / Browse /
+        # Stats / LSAT / Sync) so users can't reach unfinished, off-brand pages.
+        # The toolbar's own hide()/show() only toggle a CSS class, so calling the
+        # real QWidget setVisible(False) once keeps it hidden for good.
+        tweb.setVisible(False)
 
         # force webengine processes to load before cwd is changed
         if is_win:
@@ -1464,6 +1510,32 @@ title="{}" {}>{}</button>""".format(
             QKeySequence("F11") if is_lin else QKeySequence.StandardKey.FullScreen
         )
         m.actionFullScreen.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
+
+        # LSAT Speedrun
+        self._setup_lsat_menu()
+
+    def _setup_lsat_menu(self) -> None:
+        menu = self.form.menubar.addMenu("LSAT")
+        home_action = menu.addAction("Open LSAT Home")
+        qconnect(home_action.triggered, self.onLsatHome)
+        menu.addSeparator()
+        import_action = menu.addAction("Load sample LSAT deck")
+        qconnect(import_action.triggered, self.onLsatImport)
+        readiness_action = menu.addAction("Show readiness scores")
+        qconnect(readiness_action.triggered, self.onLsatReadiness)
+
+    def onLsatHome(self) -> None:
+        self.moveToState("lsatHome")
+
+    def onLsatImport(self) -> None:
+        from aqt.lsat import import_lsat_content
+
+        import_lsat_content(self)
+
+    def onLsatReadiness(self) -> None:
+        from aqt.lsat import show_readiness
+
+        show_readiness(self)
 
     def updateTitleBar(self) -> None:
         self.setWindowTitle("Anki")
