@@ -62,6 +62,50 @@ reviews merge through Anki's normal sync without being lost or double-counted. S
 
 ---
 
+## Download and install (no building required)
+
+If you just want to **use** `homebase.` — not build it from source — grab a
+prebuilt installer from the repo's
+**[Releases page](https://github.com/oshikanoma/lsat_app/releases/latest)**.
+No developer tools required; download, open, done.
+
+### macOS (desktop)
+
+1. On the [latest release](https://github.com/oshikanoma/lsat_app/releases/latest),
+   download **`anki-26.05-mac-apple.dmg`** (Apple Silicon: M1/M2/M3/M4). Intel
+   Macs aren't prebuilt yet — build from source (below) or ask for an Intel
+   `.dmg`.
+2. Double-click the downloaded `.dmg`, then drag **Anki** into your
+   **Applications** folder. (The app is packaged under Anki's name — that's the
+   engine `homebase.` runs on — but it opens straight to the LSAT home screen.)
+3. **First launch only:** because this build isn't signed with a paid Apple
+   Developer certificate, macOS will refuse to open it the first time with a
+   message like *"Apple could not verify … is free of malware."* This is
+   expected. To get past it once:
+   - Open **System Settings → Privacy & Security**, scroll to the bottom, and
+     click **Open Anyway** next to the Anki message, then confirm with **Open**.
+   - (Alternatively: **Control-click** the app in Applications → **Open** →
+     **Open**.)
+
+   After that first time it launches normally with a double-click, forever.
+
+> Why the warning? Signing an app so it opens with zero friction requires an
+> Apple Developer ID ($99/year) and notarization. This build is *ad-hoc signed*
+> instead, which is free but triggers the one-time prompt above. The app itself
+> is unchanged.
+
+### Android (phone)
+
+1. On the [latest release](https://github.com/oshikanoma/lsat_app/releases/latest),
+   download the file ending in **`.apk`** onto your Android phone.
+2. Tap the downloaded file. Android will ask permission to *"install unknown
+   apps"* from your browser or Files app — allow it (this is the normal prompt
+   for any app installed outside the Play Store), then tap **Install**.
+3. Open the app; it launches to the same `homebase.` home screen and syncs with
+   desktop via your AnkiWeb login.
+
+---
+
 ## Running the desktop app
 
 **Prerequisites:** the standard Anki dev toolchain (Rust via `rustup`, Python
