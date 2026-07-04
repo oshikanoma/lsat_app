@@ -24,3 +24,6 @@ ts/.svelte-kit
 docs/_build/
 docs/autoapi/
 .complexipy_cache
+# LSAT AI tutor key — never commit (bundled into the app locally only)
+openai_key.txt
+**/openai_key.txt

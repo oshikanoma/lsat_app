@@ -17,6 +17,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         choices: Choice[];
         answer: string;
         explanation: string;
+        questionType?: string | null;
+        passage?: string | null;
     };
 
     let step: "name" | "date" | "diag" | "saving" = "name";
@@ -26,7 +28,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     let questions: Q[] = [];
     let qIndex = 0;
     let picked: string | null = null;
-    let answers: { section: string; correct: boolean }[] = [];
+    let answers: {
+        section: string;
+        correct: boolean;
+        questionType?: string | null;
+        passage?: string | null;
+    }[] = [];
 
     function call<T>(cmd: string): Promise<T | null> {
         return new Promise((resolve) => {
@@ -76,6 +83,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             {
                 section: current.section,
                 correct: letter.toUpperCase() === current.answer.toUpperCase(),
+                questionType: current.questionType ?? null,
+                passage: current.passage ?? null,
             },
         ];
     }
@@ -194,6 +203,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         --green: #2f7d4f;
         --red: #b23a3a;
 
+        /* Sit above the floating clouds in the sky layer (z-index: 0) so the
+           onboarding text stays readable. */
+        position: relative;
+        z-index: 1;
         min-height: calc(100vh - 3rem);
         display: flex;
         align-items: flex-start;

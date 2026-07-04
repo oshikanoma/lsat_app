@@ -17,6 +17,14 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         sampleSize: number;
         reasons: string[];
     };
+    type TypeStat = {
+        type: string;
+        correct: number;
+        total: number;
+        accuracy: number | null;
+        enoughData: boolean;
+        needed: number;
+    };
     type Quiz = { word: string; correct: string; wrong: string };
     type WordEntry = {
         word: string;
@@ -57,6 +65,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         loggedIn: boolean;
         scores: { memory: Score; performance: Score; readiness: Score };
         gradedReviews: number;
+        topicCoverage?: number;
+        typeBreakdown?: TypeStat[];
         nextStep: string;
         missing: string[];
         startInMenu?: boolean;
@@ -100,6 +110,23 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         setTimeout(refresh, 1500);
     }
 
+    let confirmingLogout = false;
+
+    async function logout(): Promise<void> {
+        const res = await call("lsat:logout");
+        if (res) {
+            state = res;
+            view = "hub";
+            showShop = false;
+            openScore = null;
+        }
+    }
+
+    async function confirmLogout(): Promise<void> {
+        confirmingLogout = false;
+        await logout();
+    }
+
     async function buyUpgrade(id: string): Promise<void> {
         const res = await call(`lsat:house:buy:${id}`);
         if (res) {
@@ -133,11 +160,14 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
     let timer: ReturnType<typeof setInterval>;
     onMount(async () => {
-        const res = await call("lsat:vocab:ensure");
-        if (res) {
-            state = res;
-        } else {
-            await refresh();
+        await refresh();
+        // Only begin building progress (the daily word) once signed in; on
+        // mobile, login is handled natively so keep the existing behaviour.
+        if (state?.loggedIn) {
+            const res = await call("lsat:vocab:ensure");
+            if (res) {
+                state = res;
+            }
         }
         // Skip the "tap the homebase" hub if the user already started this run.
         if (!viewInit) {
@@ -211,6 +241,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
     $: vocabCount = state?.vocabCount ?? 0;
     $: gradedReviews = state?.gradedReviews ?? 0;
+    $: topicCoverage = state?.topicCoverage ?? 0;
+    $: typeBreakdown = state?.typeBreakdown ?? [];
+    $: practicedTypes = typeBreakdown.filter((t) => t.total > 0);
     $: nextStep = state?.nextStep ?? "Loading…";
     $: missing = state?.missing ?? [];
     $: loggedIn = state?.loggedIn ?? false;
@@ -229,19 +262,69 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
     <header class="bar">
         <span class="brand">homebase.</span>
-        {#if onboarded}
+        {#if loggedIn}
             <div class="bar-right">
                 <span class="coins" title="Coins">
                     <span class="coin-icon" aria-hidden="true"></span>{coins.toLocaleString()}
                 </span>
-                <button class="sync" class:on={loggedIn} on:click={sync}>
-                    {loggedIn ? "Synced" : "Sign in"}
+                <button class="sync on" on:click={sync}>Synced</button>
+                <button
+                    class="mini"
+                    on:click={() => (confirmingLogout = true)}
+                    title="Sign out and clear this device's progress"
+                >
+                    Sign out
                 </button>
             </div>
         {/if}
     </header>
 
-    {#if state && !onboarded}
+    {#if confirmingLogout}
+        <div
+            class="modal-scrim"
+            role="presentation"
+            on:click={() => (confirmingLogout = false)}
+        >
+            <div
+                class="logout-card"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="logout-title"
+                on:click|stopPropagation
+            >
+                <h3 id="logout-title">Sign out?</h3>
+                <p>
+                    Your progress is saved to your AnkiWeb account — your name,
+                    coins, homebase, vocabulary and stats. Signing out just locks
+                    this device; sign back in anytime to pick up right where you
+                    left off, here or on any other device.
+                </p>
+                <div class="modal-actions">
+                    <button class="modal-cancel" on:click={() => (confirmingLogout = false)}>
+                        Cancel
+                    </button>
+                    <button class="modal-confirm" on:click={confirmLogout}>
+                        Sign out
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if state && !loggedIn}
+        <section class="gate" in:fade={{ duration: 300 }}>
+            <div class="gate-card">
+                <span class="gate-brand">homebase.</span>
+                <p class="gate-tag">Your LSAT prep, synced across every device.</p>
+                <button class="gate-btn" on:click={sync}>Sign in to begin</button>
+                <p class="gate-note">
+                    Sign in with your AnkiWeb account. Your progress lives on the
+                    account and syncs across every device, so you'll pick up right
+                    where you left off.
+                </p>
+            </div>
+        </section>
+    {:else if state && !onboarded}
         <Onboarding on:done={(e) => (state = e.detail)} />
     {:else}
         <main class="stage" class:hub={view === "hub"} class:menu={view === "menu"} class:mobile>
@@ -564,7 +647,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                     <section class="wotd" in:fly={{ y: 24, duration: 500, delay: 180, easing: backOut }}>
                         <div class="wotd-head">
                             <span class="eyebrow">Word of the day</span>
-                            {#if words.length > 1}
+                            {#if words.length}
                                 <div class="nav">
                                     <button class="navbtn" on:click={prevWord} disabled={wordIndex <= 0} aria-label="Previous word">‹</button>
                                     <span class="navcount">{wordIndex + 1}/{words.length}</span>
@@ -632,7 +715,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                     <section class="dashboard" in:fly={{ y: 24, duration: 500, delay: 390, easing: backOut }}>
                         <div class="dash-head">
                             <h2>Your scores</h2>
-                            <span class="reviews">{gradedReviews} graded review{gradedReviews === 1 ? "" : "s"}</span>
+                            <span class="reviews">
+                                {gradedReviews} graded review{gradedReviews === 1 ? "" : "s"}
+                                · {Math.round(topicCoverage * 100)}% of exam covered
+                            </span>
                         </div>
 
                         <div class="score-grid">
@@ -686,6 +772,29 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                         <li>{m}</li>
                                     {/each}
                                 </ul>
+                            </div>
+                        {/if}
+
+                        {#if practicedTypes.length}
+                            <div class="types">
+                                <span class="next-label">Logical Reasoning by question type</span>
+                                <ul class="type-list">
+                                    {#each typeBreakdown as t}
+                                        <li class="type-row" class:untried={t.total === 0}>
+                                            <span class="type-name">{t.type}</span>
+                                            {#if t.accuracy !== null}
+                                                <span class="type-acc" class:weak={(t.accuracy ?? 1) < 0.6}>
+                                                    {Math.round((t.accuracy ?? 0) * 100)}%
+                                                </span>
+                                            {:else if t.total === 0}
+                                                <span class="type-note">not tried yet</span>
+                                            {:else}
+                                                <span class="type-note">{t.needed} more to score</span>
+                                            {/if}
+                                        </li>
+                                    {/each}
+                                </ul>
+                                <span class="type-foot">Lessons steer toward your weakest types first.</span>
                             </div>
                         {/if}
                     </section>
@@ -835,6 +944,129 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         transition: background 120ms ease;
         &:hover { background: rgba(246, 237, 218, 0.12); }
         &.on { border-color: var(--beige); }
+    }
+    .mini {
+        padding: 0.4rem 0.7rem;
+        border: 1px solid rgba(246, 237, 218, 0.35);
+        border-radius: 8px;
+        color: rgba(246, 237, 218, 0.85);
+        font-weight: 600;
+        font-size: 0.82rem;
+        transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+        &:hover { background: rgba(246, 237, 218, 0.12); color: var(--beige); }
+    }
+
+    /* ---- login gate ---- */
+    .gate {
+        position: relative;
+        z-index: 1;
+        min-height: calc(100vh - 4rem);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1.5rem;
+    }
+    .gate-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.6rem;
+        max-width: 26rem;
+        padding: 2.4rem 2rem;
+        background: var(--paper);
+        border: 1px solid var(--beige-deep);
+        border-radius: 18px;
+        box-shadow: 0 18px 44px rgba(74, 13, 24, 0.16);
+    }
+    .gate-brand {
+        font-weight: 800;
+        font-size: 2.4rem;
+        line-height: 1;
+        color: var(--maroon-deep);
+    }
+    .gate-tag {
+        margin: 0.2rem 0 0.4rem;
+        color: var(--muted);
+        font-size: 1rem;
+    }
+    .gate-btn {
+        margin-top: 0.4rem;
+        padding: 0.85rem 2rem;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: var(--beige);
+        background: var(--maroon);
+        box-shadow: 0 8px 20px rgba(74, 13, 24, 0.22);
+        transition: background 120ms ease, transform 120ms ease;
+        &:hover { background: var(--maroon-bright); transform: translateY(-2px); }
+    }
+    .gate-note {
+        margin: 0.6rem 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.5;
+    }
+
+    /* ---- sign-out confirmation modal ---- */
+    .modal-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        background: rgba(44, 27, 30, 0.62);
+    }
+    .logout-card {
+        position: relative;
+        z-index: 1;
+        display: block;
+        max-width: 24rem;
+        width: 100%;
+        background: #fffdf6;
+        border: 1px solid var(--beige-deep);
+        border-radius: 16px;
+        padding: 1.6rem 1.5rem 1.3rem;
+        box-shadow: 0 20px 50px rgba(74, 13, 24, 0.28);
+        h3 {
+            margin: 0 0 0.6rem;
+            color: var(--maroon-deep);
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+        p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+    }
+    .modal-actions {
+        margin-top: 1.3rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
+    }
+    .modal-cancel,
+    .modal-confirm {
+        padding: 0.55rem 1.2rem;
+        border-radius: 9px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: background 120ms ease, transform 80ms ease;
+    }
+    .modal-cancel {
+        color: var(--ink);
+        background: var(--beige-deep);
+        &:hover { background: #e0d3b3; }
+    }
+    .modal-confirm {
+        color: var(--beige);
+        background: var(--maroon);
+        &:hover { background: var(--maroon-bright); transform: translateY(-1px); }
     }
 
     /* ---- stage + morphing homebase ---- */
@@ -1124,6 +1356,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         .wotd-actions { display: flex; gap: 0.6rem; margin-top: 0.9rem; flex-wrap: wrap; }
     }
 
+    /* Bigger, thumb-friendly left/right word arrows at the top-right of the
+       word-of-the-day box on the phone (desktop keeps the compact glyphs). */
+    .stage.mobile .wotd .nav { gap: 0.5rem; }
+    .stage.mobile .wotd .navbtn { width: 2.4rem; height: 2.4rem; font-size: 1.6rem; border-radius: 8px; }
+    .stage.mobile .wotd .navcount { font-size: 0.85rem; }
+
     .primary {
         padding: 0.55rem 1.1rem;
         border-radius: 8px;
@@ -1181,11 +1419,20 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         .score-why { margin-top: 0.5rem; font-size: 0.72rem; font-weight: 700; color: var(--maroon-bright); letter-spacing: 0.02em; }
         .reasons { margin: 0.4rem 0 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.78rem; li { margin-bottom: 0.15rem; } }
     }
-    .next, .missing { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--beige-deep); }
+    .next, .missing, .types { margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--beige-deep); }
     .next { display: flex; flex-direction: column; gap: 0.15rem; }
     .next-label { text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.06em; color: var(--maroon-bright); font-weight: 800; }
     .next-text { font-weight: 600; }
     .missing ul { margin: 0.3rem 0 0; padding-left: 1.2rem; color: var(--muted); font-size: 0.85rem; }
+
+    .type-list { list-style: none; margin: 0.45rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .type-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.88rem; }
+    .type-row.untried { opacity: 0.6; }
+    .type-name { font-weight: 600; }
+    .type-acc { font-weight: 800; color: #2f7d43; }
+    .type-acc.weak { color: var(--maroon-bright); }
+    .type-note { font-size: 0.8rem; color: var(--muted); }
+    .type-foot { display: block; margin-top: 0.5rem; font-size: 0.78rem; color: var(--muted); font-style: italic; }
 
     @media (max-width: 640px) {
         .score-grid { grid-template-columns: 1fr; }

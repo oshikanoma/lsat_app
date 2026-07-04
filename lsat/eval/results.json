@@ -1,0 +1,331 @@
+{
+  "cutoff": {
+    "accuracy": 0.8,
+    "wrong_answer_rate_max": 0.1
+  },
+  "baseline": {
+    "n": 37,
+    "tp": 17,
+    "tn": 11,
+    "fp": 5,
+    "fn": 4,
+    "accuracy": 0.7567567567567568,
+    "wrong_answer_rate": 0.3125,
+    "precision": 0.7727272727272727,
+    "recall": 0.8095238095238095,
+    "f1": 0.7906976744186046
+  },
+  "baseline_ships": false,
+  "ai": {
+    "n": 37,
+    "tp": 16,
+    "tn": 15,
+    "fp": 1,
+    "fn": 5,
+    "accuracy": 0.8378378378378378,
+    "wrong_answer_rate": 0.0625,
+    "precision": 0.9411764705882353,
+    "recall": 0.7619047619047619,
+    "f1": 0.8421052631578947
+  },
+  "ai_ships": true,
+  "ran_ai": true,
+  "per_case": [
+    {
+      "id": "ev-001",
+      "item_id": "lr-0001",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-002",
+      "item_id": "lr-0001",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-003",
+      "item_id": "lr-0001",
+      "category": "wrong_choice",
+      "gold": false,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-004",
+      "item_id": "lr-0001",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-005",
+      "item_id": "lr-0001",
+      "category": "factually_wrong",
+      "gold": false,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-006",
+      "item_id": "lr-0003",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-007",
+      "item_id": "lr-0003",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-008",
+      "item_id": "lr-0003",
+      "category": "rough_correct",
+      "gold": true,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-009",
+      "item_id": "lr-0003",
+      "category": "factually_wrong",
+      "gold": false,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-010",
+      "item_id": "lr-0003",
+      "category": "injection",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-011",
+      "item_id": "lr-0009",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-012",
+      "item_id": "lr-0009",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-013",
+      "item_id": "lr-0009",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-014",
+      "item_id": "lr-0002",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-015",
+      "item_id": "lr-0002",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-016",
+      "item_id": "lr-0002",
+      "category": "factually_wrong",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-017",
+      "item_id": "lr-0002",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-018",
+      "item_id": "lr-0018",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-019",
+      "item_id": "lr-0018",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-020",
+      "item_id": "lr-0018",
+      "category": "offtopic",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-021",
+      "item_id": "lr-0018",
+      "category": "rough_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-022",
+      "item_id": "lr-0018",
+      "category": "wrong_choice",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-023",
+      "item_id": "lr-0004",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-024",
+      "item_id": "lr-0004",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-025",
+      "item_id": "lr-0004",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": true
+    },
+    {
+      "id": "ev-026",
+      "item_id": "lr-0004",
+      "category": "factually_wrong",
+      "gold": false,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-027",
+      "item_id": "lr-0008",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-028",
+      "item_id": "lr-0008",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-029",
+      "item_id": "lr-0008",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-030",
+      "item_id": "lr-0013",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": false,
+      "ai": true
+    },
+    {
+      "id": "ev-031",
+      "item_id": "lr-0013",
+      "category": "vague",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-032",
+      "item_id": "lr-0016",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-033",
+      "item_id": "lr-0016",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": false,
+      "ai": true
+    },
+    {
+      "id": "ev-034",
+      "item_id": "lr-0016",
+      "category": "injection",
+      "gold": false,
+      "baseline": false,
+      "ai": false
+    },
+    {
+      "id": "ev-035",
+      "item_id": "lr-0005",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    },
+    {
+      "id": "ev-036",
+      "item_id": "lr-0005",
+      "category": "factually_wrong",
+      "gold": false,
+      "baseline": true,
+      "ai": false
+    },
+    {
+      "id": "ev-037",
+      "item_id": "lr-0005",
+      "category": "solid_correct",
+      "gold": true,
+      "baseline": true,
+      "ai": true
+    }
+  ]
+}

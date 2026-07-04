@@ -15,15 +15,48 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         choices?: Choice[];
         wrongLetter?: string;
         correctAnswer?: string;
+        aiEnabled?: boolean;
     };
-    type Verdict = { correct: boolean; coins: number; explanation: string };
+    type Msg = { role: "user" | "assistant"; content: string };
+    type ChatRes = {
+        reply?: string;
+        understood?: boolean;
+        coins?: number;
+        concluded?: boolean;
+        error?: boolean;
+        source?: "ai" | "heuristic";
+    };
+    type StatusRes = { aiEnabled?: boolean };
 
     let q: Q | null = null;
     let input = "";
-    let verdict: Verdict | null = null;
+    let messages: Msg[] = [];
+    let understood = false;
+    let concluded = false;
     let busy = false;
     let coinsEarned = 0;
     let showPassage = false;
+
+    // AI tutor status badge (read-only; the key is bundled with the app)
+    let aiEnabled = false;
+
+    // --- Voice: spoken Socratic dialogue (mic in, tutor speaks back) ---
+    const OPENAI = "https://api.openai.com/v1";
+    const STT_MODEL = "whisper-1";
+    const TTS_MODEL = "gpt-4o-mini-tts";
+    const TTS_FALLBACK_MODEL = "tts-1";
+    const TTS_VOICE = "alloy";
+
+    let voiceKey = "";
+    let voiceReady = false; // key present + browser can capture audio
+    let speakOn = true; // tutor reads replies aloud
+    let recording = false;
+    let transcribing = false;
+    let speaking = false;
+    let mediaRecorder: MediaRecorder | null = null;
+    let recordedChunks: BlobPart[] = [];
+    let micStream: MediaStream | null = null;
+    let currentAudio: HTMLAudioElement | null = null;
 
     // Arrival animation: train chugs in -> intro card -> live station
     let phase: "arriving" | "intro" | "active" = "arriving";
@@ -40,24 +73,274 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
     async function loadNext(): Promise<void> {
         input = "";
-        verdict = null;
+        understood = false;
+        concluded = false;
         showPassage = false;
+        messages = [];
         q = await call<Q>("lsat:socratic:next");
+        if (q && typeof q.aiEnabled === "boolean") {
+            aiEnabled = q.aiEnabled;
+        }
+        if (q && !q.done) {
+            const opener =
+                "Take a look at the flagged answer below. In a sentence or two, why is it wrong?";
+            messages = [{ role: "assistant", content: opener }];
+            void speak(opener);
+        }
     }
 
-    async function submit(): Promise<void> {
-        if (busy || !input.trim() || verdict) {
+    async function send(): Promise<void> {
+        if (busy || !input.trim() || understood || concluded) {
+            return;
+        }
+        const text = input.trim();
+        messages = [...messages, { role: "user", content: text }];
+        input = "";
+        busy = true;
+        const res = await call<ChatRes>(
+            "lsat:socratic:chat:" + JSON.stringify({ history: messages }),
+        );
+        busy = false;
+        if (res?.reply) {
+            messages = [...messages, { role: "assistant", content: res.reply }];
+            void speak(res.reply);
+        } else if (!res || res.error) {
+            messages = [
+                ...messages,
+                {
+                    role: "assistant",
+                    content:
+                        "Sorry — I couldn't reach the tutor just now. Give it another try.",
+                },
+            ];
+        }
+        if (res?.understood) {
+            understood = true;
+            if (res.coins) {
+                coinsEarned += res.coins;
+            }
+        }
+        if (res?.concluded) {
+            concluded = true;
+        }
+        if (res?.source) {
+            aiEnabled = res.source === "ai";
+        }
+    }
+
+    async function refreshStatus(): Promise<void> {
+        const s = await call<StatusRes>("lsat:socratic:status");
+        if (s && typeof s.aiEnabled === "boolean") {
+            aiEnabled = s.aiEnabled;
+        }
+    }
+
+    async function reveal(): Promise<void> {
+        if (busy || understood || concluded) {
             return;
         }
         busy = true;
-        verdict = await call<Verdict>("lsat:socratic:submit:" + input);
+        const res = await call<ChatRes>("lsat:socratic:reveal");
         busy = false;
-        if (verdict?.coins) {
-            coinsEarned += verdict.coins;
+        if (res?.reply) {
+            messages = [...messages, { role: "assistant", content: res.reply }];
+            void speak(res.reply);
+        }
+        concluded = true;
+    }
+
+    function pushBot(content: string): void {
+        messages = [...messages, { role: "assistant", content }];
+    }
+
+    async function loadVoiceCreds(): Promise<void> {
+        const c = await call<{ key?: string }>("lsat:socratic:voicecreds");
+        voiceKey = (c && c.key) || "";
+        const canCapture =
+            typeof navigator !== "undefined" &&
+            !!navigator.mediaDevices &&
+            typeof navigator.mediaDevices.getUserMedia === "function" &&
+            typeof window !== "undefined" &&
+            "MediaRecorder" in window;
+        voiceReady = !!voiceKey && canCapture;
+    }
+
+    async function toggleRecording(): Promise<void> {
+        if (!voiceReady || busy || transcribing || understood || concluded) {
+            return;
+        }
+        if (recording) {
+            stopRecording();
+            return;
+        }
+        // Don't record the tutor talking over us.
+        stopSpeaking();
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (e) {
+            pushBot(
+                "I couldn't get to your microphone — check mic permission, or just type your answer below.",
+            );
+            return;
+        }
+        recordedChunks = [];
+        const rec = new MediaRecorder(micStream);
+        mediaRecorder = rec;
+        rec.ondataavailable = (ev) => {
+            if (ev.data && ev.data.size > 0) {
+                recordedChunks.push(ev.data);
+            }
+        };
+        rec.onstop = () => {
+            void handleRecordingStop(rec.mimeType);
+        };
+        rec.start();
+        recording = true;
+    }
+
+    function stopRecording(): void {
+        recording = false;
+        try {
+            mediaRecorder?.stop();
+        } catch (_) {
+            /* already stopped */
+        }
+        micStream?.getTracks().forEach((t) => t.stop());
+        micStream = null;
+    }
+
+    async function handleRecordingStop(mime: string): Promise<void> {
+        mediaRecorder = null;
+        if (!recordedChunks.length) {
+            return;
+        }
+        const type = mime || "audio/webm";
+        const blob = new Blob(recordedChunks, { type });
+        recordedChunks = [];
+        await transcribeAndSend(blob, type);
+    }
+
+    function fileNameFor(mime: string): string {
+        if (mime.includes("ogg")) return "speech.ogg";
+        if (mime.includes("mp4") || mime.includes("m4a")) return "speech.mp4";
+        if (mime.includes("wav")) return "speech.wav";
+        if (mime.includes("mpeg") || mime.includes("mp3")) return "speech.mp3";
+        return "speech.webm";
+    }
+
+    async function transcribeAndSend(blob: Blob, mime: string): Promise<void> {
+        transcribing = true;
+        try {
+            const form = new FormData();
+            form.append("file", blob, fileNameFor(mime));
+            form.append("model", STT_MODEL);
+            const resp = await fetch(`${OPENAI}/audio/transcriptions`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${voiceKey}` },
+                body: form,
+            });
+            if (!resp.ok) {
+                throw new Error(`STT ${resp.status}`);
+            }
+            const data = await resp.json();
+            const text = (data.text || "").trim();
+            transcribing = false;
+            if (text) {
+                input = text;
+                await send();
+            } else {
+                pushBot("I didn't quite catch that — want to try saying it again?");
+            }
+        } catch (e) {
+            transcribing = false;
+            pushBot(
+                "Sorry, I couldn't make out the recording. Give it another go, or type your answer instead.",
+            );
         }
     }
 
-    const exit = () => bridgeCommand("lsat:socratic:exit");
+    function stopSpeaking(): void {
+        if (currentAudio) {
+            try {
+                currentAudio.pause();
+            } catch (_) {
+                /* ignore */
+            }
+            currentAudio = null;
+        }
+        speaking = false;
+    }
+
+    async function speak(text: string): Promise<void> {
+        if (!speakOn || !voiceKey || !text) {
+            return;
+        }
+        stopSpeaking();
+        const instructions =
+            "You are a warm, encouraging LSAT tutor speaking out loud. Sound natural and conversational, at an even pace.";
+        for (const model of [TTS_MODEL, TTS_FALLBACK_MODEL]) {
+            try {
+                const body: Record<string, unknown> = {
+                    model,
+                    voice: TTS_VOICE,
+                    input: text,
+                    response_format: "mp3",
+                };
+                if (model === TTS_MODEL) {
+                    body.instructions = instructions;
+                }
+                const resp = await fetch(`${OPENAI}/audio/speech`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${voiceKey}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                });
+                if (!resp.ok) {
+                    throw new Error(`TTS ${resp.status}`);
+                }
+                const url = URL.createObjectURL(await resp.blob());
+                const audio = new Audio(url);
+                currentAudio = audio;
+                speaking = true;
+                const clear = () => {
+                    if (currentAudio === audio) {
+                        speaking = false;
+                        currentAudio = null;
+                    }
+                    URL.revokeObjectURL(url);
+                };
+                audio.onended = clear;
+                audio.onerror = clear;
+                await audio.play();
+                return;
+            } catch (e) {
+                // fall through to the next model; give up quietly if both fail
+                speaking = false;
+            }
+        }
+    }
+
+    function toggleSpeak(): void {
+        speakOn = !speakOn;
+        if (!speakOn) {
+            stopSpeaking();
+        }
+    }
+
+    function onKeydown(e: KeyboardEvent): void {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            send();
+        }
+    }
+
+    const exit = () => {
+        stopRecording();
+        stopSpeaking();
+        bridgeCommand("lsat:socratic:exit");
+    };
 
     function getStarted(): void {
         phase = "active";
@@ -65,9 +348,15 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     }
 
     onMount(() => {
+        refreshStatus();
+        void loadVoiceCreds();
         // let the train chug across, then reveal the intro card
         const t = setTimeout(() => (phase = "intro"), 2600);
-        return () => clearTimeout(t);
+        return () => {
+            clearTimeout(t);
+            stopRecording();
+            stopSpeaking();
+        };
     });
 </script>
 
@@ -75,7 +364,54 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     <header class="bar">
         <button class="back" on:click={exit}>Home</button>
         <span class="title">Socratic Station</span>
-        <span class="coins">{coinsEarned.toLocaleString()} earned</span>
+        <div class="bar-right">
+            {#if voiceReady}
+                <button
+                    class="voice-toggle"
+                    class:on={speakOn}
+                    class:speaking
+                    on:click={toggleSpeak}
+                    aria-pressed={speakOn}
+                    title={speakOn
+                        ? "Tutor voice on — tap to mute"
+                        : "Tutor voice off — tap to unmute"}
+                >
+                    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                        <path
+                            d="M4 9v6h4l5 4V5L8 9H4z"
+                            fill="currentColor"
+                        />
+                        {#if speakOn}
+                            <path
+                                d="M16 8.5a4 4 0 0 1 0 7M18.5 6a7 7 0 0 1 0 12"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+                        {:else}
+                            <path
+                                d="M17 9.5l4 5M21 9.5l-4 5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+                        {/if}
+                    </svg>
+                    Voice
+                </button>
+            {/if}
+            <span
+                class="engine"
+                class:on={aiEnabled}
+                title={aiEnabled ? "AI tutor active" : "Offline grader"}
+            >
+                <span class="dot-led" class:on={aiEnabled}></span>
+                {aiEnabled ? "AI tutor" : "Offline grader"}
+            </span>
+            <span class="coins">{coinsEarned.toLocaleString()} earned</span>
+        </div>
     </header>
 
     <main class="stage" class:wide={phase !== "active"}>
@@ -153,7 +489,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         {:else}
             <div class="chat">
                 <div class="bubble bot">
-                    <p class="lead">All five answer choices are below. The <b>flagged</b> one is wrong — compare it against the others and explain <b>why it fails</b>, being specific about the exact flaw.</p>
+                    <p class="lead">The <b>flagged</b> choice below is wrong. Talk it through with me and I'll help you pin down exactly <b>why</b> — I may ask you to clarify.</p>
                     {#if q.stimulus}
                         <button class="passage-toggle" on:click={() => (showPassage = !showPassage)}>
                             {showPassage ? "Hide context" : "Show context"}
@@ -169,14 +505,14 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                 <div
                                     class="choice"
                                     class:target={c.letter === q.wrongLetter}
-                                    class:correct={verdict && c.letter === q.correctAnswer}
+                                    class:correct={understood && c.letter === q.correctAnswer}
                                 >
                                     <span class="letter">{c.letter}</span>
                                     <span class="ctext">{c.text}</span>
                                     {#if c.letter === q.wrongLetter}
                                         <span class="tag tag-wrong">explain this</span>
                                     {/if}
-                                    {#if verdict && c.letter === q.correctAnswer}
+                                    {#if understood && c.letter === q.correctAnswer}
                                         <span class="tag tag-right">correct</span>
                                     {/if}
                                 </div>
@@ -185,30 +521,111 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                     {/if}
                 </div>
 
-                {#if verdict}
-                    <div class="bubble user">{input}</div>
-                    <div class="bubble bot verdict" class:good={verdict.correct} class:bad={!verdict.correct}>
+                {#each messages as m}
+                    <div
+                        class="bubble msg"
+                        class:bot={m.role === "assistant"}
+                        class:user={m.role === "user"}
+                    >
+                        <span class="msg-text">{m.content}</span>
+                        {#if voiceReady && m.role === "assistant"}
+                            <button
+                                class="replay"
+                                on:click={() => speak(m.content)}
+                                title="Play aloud"
+                                aria-label="Play this reply aloud"
+                            >
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" fill="currentColor" />
+                                </svg>
+                            </button>
+                        {/if}
+                    </div>
+                {/each}
+
+                {#if busy}
+                    <div class="bubble bot typing" aria-label="Tutor is thinking">
+                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    </div>
+                {/if}
+
+                {#if understood || concluded}
+                    <div class="bubble bot verdict" class:good={understood} class:bad={!understood}>
                         <p class="lead">
-                            {verdict.correct
-                                ? `Nice — that's the flaw. +${verdict.coins} coins.`
-                                : "Close, but that's not quite the precise flaw. Compare with this:"}
+                            {understood
+                                ? "Nicely reasoned — coins added to your homebase."
+                                : "That's the flaw. No coins this time — but now you've seen it."}
                         </p>
-                        <p class="model">{verdict.explanation}</p>
                         <button class="cta" on:click={loadNext}>Next question</button>
                     </div>
                 {/if}
             </div>
 
-            {#if !verdict}
+            {#if !understood && !concluded}
                 <div class="composer">
+                    {#if recording || transcribing || speaking}
+                        <div class="voice-status" class:rec={recording}>
+                            {#if recording}
+                                <span class="pulse"></span> Listening… tap the mic when you're done
+                            {:else if transcribing}
+                                <span class="spin"></span> Transcribing what you said…
+                            {:else}
+                                <span class="pulse soft"></span> Tutor is speaking…
+                            {/if}
+                        </div>
+                    {/if}
                     <textarea
                         bind:value={input}
-                        placeholder="This answer is wrong because…"
+                        on:keydown={onKeydown}
+                        placeholder={voiceReady
+                            ? "Tap the mic to talk it through — or type here…"
+                            : "This answer is wrong because…"}
                         rows="3"
                     ></textarea>
-                    <button class="cta" disabled={!input.trim() || busy} on:click={submit}>
-                        {busy ? "Checking…" : "Submit"}
-                    </button>
+                    <div class="composer-actions">
+                        <div class="left-actions">
+                            {#if voiceReady}
+                                <button
+                                    class="mic"
+                                    class:rec={recording}
+                                    disabled={busy || transcribing || understood || concluded}
+                                    on:click={toggleRecording}
+                                    title={recording
+                                        ? "Stop and send"
+                                        : "Talk it through out loud"}
+                                >
+                                    {#if recording}
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />
+                                        </svg>
+                                        Stop
+                                    {:else}
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
+                                            <path
+                                                d="M6 11a6 6 0 0 0 12 0M12 17v3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="1.8"
+                                                stroke-linecap="round"
+                                            />
+                                        </svg>
+                                        {transcribing ? "…" : "Speak"}
+                                    {/if}
+                                </button>
+                            {/if}
+                            <button class="pass" disabled={busy || recording} on:click={reveal}>
+                                Skip &amp; show me
+                            </button>
+                        </div>
+                        <button
+                            class="cta"
+                            disabled={!input.trim() || busy || recording}
+                            on:click={send}
+                        >
+                            {busy ? "Thinking…" : "Send"}
+                        </button>
+                    </div>
                 </div>
             {/if}
         {/if}
@@ -279,6 +696,69 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             }
         }
     }
+    .bar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+    .engine {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.28rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--beige);
+        background: rgba(246, 237, 218, 0.12);
+        &.on {
+            color: #fffdf6;
+            background: rgba(47, 125, 79, 0.55);
+        }
+    }
+    .dot-led {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: var(--gold);
+        box-shadow: 0 0 0 2px rgba(200, 155, 60, 0.25);
+        &.on {
+            background: #57e08a;
+            box-shadow: 0 0 0 2px rgba(87, 224, 138, 0.3);
+        }
+    }
+    .voice-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.28rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--beige);
+        background: rgba(246, 237, 218, 0.12);
+        transition: background 120ms ease, transform 80ms ease;
+        &.on {
+            color: #fffdf6;
+            background: rgba(200, 155, 60, 0.5);
+        }
+        &.speaking svg {
+            animation: pulseFade 0.9s ease-in-out infinite;
+        }
+        &:hover {
+            transform: translateY(-1px);
+        }
+    }
+    @keyframes pulseFade {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.4;
+        }
+    }
+
 
     .stage {
         max-width: 44rem;
@@ -409,6 +889,62 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             border-bottom-right-radius: 4px;
             white-space: pre-wrap;
         }
+        &.msg {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+    }
+    .msg-text {
+        white-space: pre-wrap;
+    }
+    .replay {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--maroon-bright);
+        background: var(--beige);
+        border: 1px solid var(--beige-deep);
+        opacity: 0.7;
+        transition: opacity 120ms ease, background 120ms ease;
+        &:hover {
+            opacity: 1;
+            background: var(--beige-deep);
+        }
+    }
+
+    .typing {
+        display: flex;
+        gap: 0.32rem;
+        align-items: center;
+        .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: var(--muted);
+            animation: blink 1.2s infinite ease-in-out both;
+        }
+        .dot:nth-child(2) {
+            animation-delay: 0.18s;
+        }
+        .dot:nth-child(3) {
+            animation-delay: 0.36s;
+        }
+    }
+    @keyframes blink {
+        0%,
+        80%,
+        100% {
+            opacity: 0.25;
+            transform: translateY(0);
+        }
+        40% {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
     }
     .lead {
         margin: 0 0 0.6rem;
@@ -506,6 +1042,103 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         .model {
             margin: 0 0 1rem;
             line-height: 1.55;
+        }
+    }
+
+    .composer-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.6rem;
+    }
+    .left-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .mic {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 9px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--beige);
+        background: var(--maroon-bright);
+        transition: background 120ms ease, transform 80ms ease;
+        &:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        &:disabled {
+            opacity: 0.45;
+            cursor: default;
+        }
+        &.rec {
+            background: var(--red);
+            animation: recGlow 1.1s ease-in-out infinite;
+        }
+    }
+    @keyframes recGlow {
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(178, 58, 58, 0.5);
+        }
+        50% {
+            box-shadow: 0 0 0 6px rgba(178, 58, 58, 0);
+        }
+    }
+    .voice-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 0.2rem 0.1rem;
+        &.rec {
+            color: var(--red);
+        }
+        .pulse {
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 50%;
+            background: var(--red);
+            animation: recGlow 1.1s ease-in-out infinite;
+            &.soft {
+                background: var(--maroon-bright);
+            }
+        }
+        .spin {
+            width: 0.8rem;
+            height: 0.8rem;
+            border-radius: 50%;
+            border: 2px solid var(--beige-deep);
+            border-top-color: var(--maroon-bright);
+            animation: spin 0.8s linear infinite;
+        }
+    }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .pass {
+        padding: 0.55rem 1rem;
+        border-radius: 9px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: var(--muted);
+        border: 1px solid var(--beige-deep);
+        background: var(--paper);
+        transition: background 120ms ease, color 120ms ease;
+        &:hover:not(:disabled) {
+            background: var(--beige-deep);
+            color: var(--maroon-deep);
+        }
+        &:disabled {
+            opacity: 0.45;
+            cursor: default;
         }
     }
 

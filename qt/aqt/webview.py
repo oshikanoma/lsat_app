@@ -132,6 +132,25 @@ class AnkiWebPage(QWebEnginePage):
         self._kind = kind
         self._setupBridge()
         self.open_links_externally = True
+        # Grant microphone capture to our own pages (used by the LSAT Socratic
+        # Station's spoken dialogue). Only our trusted local pages load here.
+        try:
+            self.featurePermissionRequested.connect(self._on_feature_permission)
+        except Exception:
+            pass
+
+    def _on_feature_permission(
+        self, origin: QUrl, feature: "QWebEnginePage.Feature"
+    ) -> None:
+        try:
+            if feature == QWebEnginePage.Feature.MediaAudioCapture:
+                self.setFeaturePermission(
+                    origin,
+                    feature,
+                    QWebEnginePage.PermissionPolicy.PermissionGrantedByUser,
+                )
+        except Exception:
+            pass
 
     def _profileForPage(self, kind: AnkiWebViewKind) -> QWebEngineProfile:
         have_api_access = kind in (

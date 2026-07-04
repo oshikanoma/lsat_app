@@ -5,12 +5,17 @@
 //!
 //! - **Memory**: average current FSRS recall probability across reviewed cards,
 //!   with a 95% confidence interval for the mean.
-//! - **Performance**: the memory -> new-question bridge. Not enabled before the
-//!   Friday (AI) milestone, so it honestly reports "unavailable" instead of
-//!   inventing a number.
-//! - **Readiness**: the performance -> projected-score bridge. Enforces the
-//!   give-up rule (PRD §8.2): no score until there is enough graded data *and* a
-//!   working performance model.
+//! - **Performance**: how accurately the learner answers graded LR/RC practice
+//!   questions, with a 95% confidence interval. Hidden until there are enough
+//!   graded questions to be meaningful.
+//! - **Readiness**: the performance -> projected-score bridge (120–180). Enforces
+//!   the give-up rule (PRD §8.2): shows NO score until ALL of the following hold
+//!   — at least [`MIN_GRADED_PRACTICE_FOR_READINESS`] graded practice questions,
+//!   at least [`MIN_LR_COVERAGE_FOR_READINESS`] of the LR question-type taxonomy
+//!   covered, at least [`MIN_RC_PASSAGES_FOR_READINESS`] completed RC passages,
+//!   and a working performance model. Until then it reports exactly what is
+//!   missing. Once unlocked it projects performance accuracy onto the 120–180
+//!   scale with a range.
 //!
 //! Exposed to every client (desktop + mobile) through the shared backend, so the
 //! same engine drives both apps.
@@ -40,15 +45,57 @@ pub(crate) const MIN_MEMORY_CARDS: usize = 10;
 /// performance score. Below this we refuse to guess.
 pub(crate) const MIN_ATTEMPTS_FOR_PERFORMANCE: usize = 20;
 
-/// Give-up rule for readiness: minimum graded reviews before a readiness score
-/// can be shown (mirrors PRD §8.2).
-pub(crate) const MIN_GRADED_REVIEWS_FOR_READINESS: usize = 200;
+/// Give-up rule (PRD §8.2), part 1: minimum graded practice questions across the
+/// two scored sections before a readiness score can be shown.
+pub(crate) const MIN_GRADED_PRACTICE_FOR_READINESS: usize = 200;
 
-/// One graded practice answer, as persisted in the collection config.
+/// Give-up rule (PRD §8.2), part 2: minimum fraction of the LR question-type
+/// taxonomy the learner must have attempted (0..1).
+pub(crate) const MIN_LR_COVERAGE_FOR_READINESS: f32 = 0.50;
+
+/// Give-up rule (PRD §8.2), part 3: minimum number of distinct completed RC
+/// passages.
+pub(crate) const MIN_RC_PASSAGES_FOR_READINESS: usize = 3;
+
+/// The exam's Logical Reasoning question-type taxonomy. Readiness coverage is
+/// measured as the fraction of these types the learner has actually attempted.
+/// Compared case-insensitively against each attempt's `question_type`, so the
+/// content bank's labels ("Weaken", "Necessary Assumption", "Resolve/Explain", …)
+/// map straight onto it.
+pub(crate) const LR_TAXONOMY: [&str; 14] = [
+    "main point",
+    "necessary assumption",
+    "sufficient assumption",
+    "strengthen",
+    "weaken",
+    "flaw",
+    "inference",
+    "method of reasoning",
+    "parallel reasoning",
+    "parallel flaw",
+    "principle",
+    "resolve/explain",
+    "point at issue",
+    "role in argument",
+];
+
+/// One graded practice answer, as persisted in the collection config by the
+/// desktop/mobile practice flow. Older entries only carry `correct`; the
+/// section/type/passage fields were added to drive the readiness coverage rules
+/// and default to `None` when absent.
 #[derive(Debug, Clone, Deserialize)]
 struct Attempt {
     #[serde(default)]
     correct: bool,
+    /// "lr" or "rc" (section the question belongs to).
+    #[serde(default)]
+    section: Option<String>,
+    /// LR question type, e.g. "Weaken" (used for taxonomy coverage).
+    #[serde(default)]
+    question_type: Option<String>,
+    /// Stable identifier of the RC passage (used to count distinct passages).
+    #[serde(default)]
+    passage: Option<String>,
 }
 
 fn unavailable(reasons: Vec<String>, sample_size: usize) -> LsatScore {
@@ -148,25 +195,114 @@ fn performance_score(attempts: &[bool]) -> LsatScore {
     }
 }
 
-/// Readiness (performance -> projected LSAT score). Enforces the give-up rule:
-/// no score until there is enough graded data AND a working performance model.
-fn readiness_score(graded_reviews: usize, performance_available: bool) -> LsatScore {
+/// Coverage of the readiness give-up rule, derived from the graded attempts.
+struct Coverage {
+    /// Number of graded practice questions answered.
+    graded_practice: usize,
+    /// Distinct LR question types attempted, over the taxonomy size (0..1).
+    lr_coverage: f32,
+    /// Distinct completed RC passages.
+    rc_passages: usize,
+}
+
+fn coverage_from_attempts(attempts: &[Attempt]) -> Coverage {
+    use std::collections::HashSet;
+    let taxonomy: HashSet<&str> = LR_TAXONOMY.iter().copied().collect();
+    let mut lr_types: HashSet<String> = HashSet::new();
+    let mut rc_passages: HashSet<String> = HashSet::new();
+    for a in attempts {
+        if let Some(qt) = &a.question_type {
+            let norm = qt.trim().to_lowercase();
+            if taxonomy.contains(norm.as_str()) {
+                lr_types.insert(norm);
+            }
+        }
+        let is_rc = a
+            .section
+            .as_deref()
+            .map(|s| s.trim().to_lowercase().starts_with("rc"))
+            .unwrap_or(false);
+        if is_rc {
+            if let Some(p) = &a.passage {
+                if !p.trim().is_empty() {
+                    rc_passages.insert(p.trim().to_string());
+                }
+            }
+        }
+    }
+    Coverage {
+        graded_practice: attempts.len(),
+        lr_coverage: lr_types.len() as f32 / LR_TAXONOMY.len() as f32,
+        rc_passages: rc_passages.len(),
+    }
+}
+
+/// Readiness (performance -> projected LSAT score, 120–180). Enforces the full
+/// three-part give-up rule (PRD §8.2) plus a working performance model; only
+/// once every condition is met does it project a score with a range. Pure
+/// function so the rule is unit-testable without a collection.
+fn readiness_score(coverage: &Coverage, performance: &LsatScore) -> LsatScore {
+    let Coverage {
+        graded_practice,
+        lr_coverage,
+        rc_passages,
+    } = *coverage;
+
     let mut reasons = Vec::new();
-    if graded_reviews < MIN_GRADED_REVIEWS_FOR_READINESS {
+    if graded_practice < MIN_GRADED_PRACTICE_FOR_READINESS {
         reasons.push(format!(
-            "Not enough data: need at least {MIN_GRADED_REVIEWS_FOR_READINESS} graded reviews, \
-             have {graded_reviews}."
+            "Need at least {MIN_GRADED_PRACTICE_FOR_READINESS} graded practice questions across LR \
+             + RC; have {graded_practice}."
         ));
     }
-    if !performance_available {
+    if lr_coverage < MIN_LR_COVERAGE_FOR_READINESS {
+        reasons.push(format!(
+            "Need to cover at least {:.0}% of the LR question-type taxonomy; currently at {:.0}%.",
+            MIN_LR_COVERAGE_FOR_READINESS * 100.0,
+            lr_coverage * 100.0
+        ));
+    }
+    if rc_passages < MIN_RC_PASSAGES_FOR_READINESS {
+        reasons.push(format!(
+            "Need at least {MIN_RC_PASSAGES_FOR_READINESS} completed RC passages; have \
+             {rc_passages}."
+        ));
+    }
+    if !performance.available {
         reasons.push(
             "A validated performance model is required before a readiness score can be shown."
                 .to_string(),
         );
     }
-    // Readiness is never fabricated in this milestone; it stays hidden until the
-    // performance model exists and the data threshold is met.
-    unavailable(reasons, graded_reviews)
+
+    if !reasons.is_empty() {
+        // A system that knows when it doesn't know: stay hidden and say why.
+        return unavailable(reasons, graded_practice);
+    }
+
+    // Give-up rule satisfied. Project graded accuracy linearly onto the real
+    // LSAT scale (120–180), carrying the performance interval through the same
+    // map so the range stays honest.
+    let scale = |accuracy: f64| 120.0 + accuracy.clamp(0.0, 1.0) * 60.0;
+    let estimate = scale(performance.estimate);
+    let low = scale(performance.low);
+    let high = scale(performance.high);
+    LsatScore {
+        available: true,
+        estimate,
+        low,
+        high,
+        confidence: performance.confidence,
+        sample_size: graded_practice as u32,
+        reasons: vec![
+            format!(
+                "Projected from {:.0}% graded accuracy over {graded_practice} questions, mapped \
+                 onto the 120–180 scale.",
+                performance.estimate * 100.0
+            ),
+            format!("Likely range is {low:.0}–{high:.0} (from the performance interval)."),
+        ],
+    }
 }
 
 impl Collection {
@@ -200,12 +336,10 @@ impl Collection {
             .count())
     }
 
-    /// Correctness of each recorded graded practice attempt.
-    fn lsat_attempts(&self) -> Vec<bool> {
-        let attempts: Vec<Attempt> = self
-            .get_config_optional(ATTEMPTS_CONFIG_KEY)
-            .unwrap_or_default();
-        attempts.into_iter().map(|a| a.correct).collect()
+    /// All recorded graded practice attempts (correctness + coverage metadata).
+    fn lsat_attempts(&self) -> Vec<Attempt> {
+        self.get_config_optional(ATTEMPTS_CONFIG_KEY)
+            .unwrap_or_default()
     }
 
     /// Compute the three honest LSAT scores.
@@ -213,33 +347,46 @@ impl Collection {
         let retrievabilities = self.lsat_retrievabilities()?;
         let graded_reviews = self.lsat_graded_reviews()?;
         let attempts = self.lsat_attempts();
+        let outcomes: Vec<bool> = attempts.iter().map(|a| a.correct).collect();
+        let coverage = coverage_from_attempts(&attempts);
 
         let memory = memory_score(&retrievabilities);
-        let performance = performance_score(&attempts);
-        let readiness = readiness_score(attempts.len(), performance.available);
+        let performance = performance_score(&outcomes);
+        let readiness = readiness_score(&coverage, &performance);
 
         let mut missing_data = Vec::new();
         if !memory.available {
             missing_data
                 .push("More reviewed cards are needed to establish a memory baseline.".to_string());
         }
-        if !performance.available {
-            missing_data.push(
-                "A validated performance model (exam-style questions) is not built yet.".to_string(),
-            );
-        }
-        if attempts.len() < MIN_GRADED_REVIEWS_FOR_READINESS {
+        if coverage.graded_practice < MIN_GRADED_PRACTICE_FOR_READINESS {
             missing_data.push(format!(
-                "{} more graded practice questions needed before a readiness score.",
-                MIN_GRADED_REVIEWS_FOR_READINESS.saturating_sub(attempts.len())
+                "{} more graded practice questions needed.",
+                MIN_GRADED_PRACTICE_FOR_READINESS.saturating_sub(coverage.graded_practice)
+            ));
+        }
+        if coverage.lr_coverage < MIN_LR_COVERAGE_FOR_READINESS {
+            missing_data.push(format!(
+                "LR taxonomy coverage is {:.0}% — reach {:.0}% by practicing more question types.",
+                coverage.lr_coverage * 100.0,
+                MIN_LR_COVERAGE_FOR_READINESS * 100.0
+            ));
+        }
+        if coverage.rc_passages < MIN_RC_PASSAGES_FOR_READINESS {
+            missing_data.push(format!(
+                "{} more RC passage(s) needed.",
+                MIN_RC_PASSAGES_FOR_READINESS.saturating_sub(coverage.rc_passages)
             ));
         }
 
         let next_best_step = if !memory.available {
             "Review more LSAT cards to build a memory baseline.".to_string()
+        } else if coverage.rc_passages < MIN_RC_PASSAGES_FOR_READINESS {
+            "Complete a timed Reading Comprehension passage.".to_string()
+        } else if coverage.lr_coverage < MIN_LR_COVERAGE_FOR_READINESS {
+            "Practice an LR question type you haven't tried yet.".to_string()
         } else if !readiness.available {
-            "Keep practicing graded questions — readiness unlocks once there is enough data and a \
-             performance model."
+            "Keep practicing graded questions — readiness unlocks once there is enough data."
                 .to_string()
         } else {
             "Focus on your weakest question type.".to_string()
@@ -250,7 +397,8 @@ impl Collection {
             performance: Some(performance),
             readiness: Some(readiness),
             graded_reviews: graded_reviews as u32,
-            topic_coverage: 0.0,
+            // "% of the exam's question-type taxonomy covered so far" (PRD §8.1).
+            topic_coverage: coverage.lr_coverage.min(1.0) as f64,
             last_updated: TimestampSecs::now().0,
             next_best_step,
             missing_data,
@@ -325,15 +473,115 @@ mod test {
         assert_eq!(score.sample_size, 40);
     }
 
+    /// Build a batch of graded attempts: `n` questions, `correct` of them right,
+    /// spread across `lr_types` distinct LR types and `rc_passages` RC passages.
+    fn attempts(n: usize, correct: usize, lr_types: usize, rc_passages: usize) -> Vec<Attempt> {
+        let mut out = Vec::new();
+        for i in 0..n {
+            let (section, question_type, passage) = if i < rc_passages {
+                // One question per distinct RC passage.
+                (Some("rc".to_string()), None, Some(format!("passage-{i}")))
+            } else {
+                let qt = LR_TAXONOMY[i % lr_types.max(1)].to_string();
+                (Some("lr".to_string()), Some(qt), None)
+            };
+            out.push(Attempt {
+                correct: i < correct,
+                section,
+                question_type,
+                passage,
+            });
+        }
+        out
+    }
+
     #[test]
-    fn readiness_refuses_until_threshold_and_model() {
-        // Not enough reviews and no performance model -> two reasons, hidden.
-        let score = readiness_score(10, false);
+    fn coverage_counts_distinct_types_and_passages() {
+        let cov = coverage_from_attempts(&attempts(40, 40, 4, 3));
+        assert_eq!(cov.graded_practice, 40);
+        assert_eq!(cov.rc_passages, 3);
+        // 4 distinct LR types out of the taxonomy.
+        assert!((cov.lr_coverage - 4.0 / LR_TAXONOMY.len() as f32).abs() < 1e-6);
+    }
+
+    #[test]
+    fn readiness_lists_each_unmet_condition() {
+        // Well below every threshold, no performance model -> all four reasons.
+        let cov = coverage_from_attempts(&attempts(5, 5, 1, 0));
+        let perf = performance_score(&[true; 5]); // unavailable (< threshold)
+        let score = readiness_score(&cov, &perf);
         assert!(!score.available);
-        assert_eq!(score.reasons.len(), 2);
-        // Enough reviews but still no performance model -> still hidden.
-        let score = readiness_score(MIN_GRADED_REVIEWS_FOR_READINESS + 1, false);
+        assert_eq!(score.reasons.len(), 4);
+    }
+
+    #[test]
+    fn readiness_hidden_until_coverage_met() {
+        // Enough questions + performance model, but zero RC passages and only
+        // one LR type -> still hidden on the two coverage rules.
+        let cov = coverage_from_attempts(&attempts(
+            MIN_GRADED_PRACTICE_FOR_READINESS,
+            MIN_GRADED_PRACTICE_FOR_READINESS,
+            1,
+            0,
+        ));
+        let perf = performance_score(&vec![true; MIN_GRADED_PRACTICE_FOR_READINESS]);
+        assert!(perf.available);
+        let score = readiness_score(&cov, &perf);
         assert!(!score.available);
-        assert_eq!(score.reasons.len(), 1);
+        assert_eq!(score.reasons.len(), 2); // LR coverage + RC passages
+    }
+
+    #[test]
+    fn readiness_scoring_latency_is_low() {
+        // Measures the real backend scoring latency end to end (config load +
+        // coverage + the three score computations) on a seeded collection, and
+        // guards against regressions. Run with `--nocapture` to print the number.
+        use std::time::Instant;
+
+        let mut col = Collection::new();
+        let mut attempts = Vec::new();
+        for i in 0..500 {
+            attempts.push(serde_json::json!({
+                "correct": i % 3 != 0,
+                "section": if i % 4 == 0 { "rc" } else { "lr" },
+                "question_type": LR_TAXONOMY[i % LR_TAXONOMY.len()],
+                "passage": format!("passage-{}", i % 6),
+            }));
+        }
+        col.set_config_json(ATTEMPTS_CONFIG_KEY, &attempts, false)
+            .unwrap();
+
+        // Warm once, then time a batch.
+        let _ = col.lsat_readiness().unwrap();
+        let iters = 50u32;
+        let start = Instant::now();
+        for _ in 0..iters {
+            let _ = col.lsat_readiness().unwrap();
+        }
+        let per = start.elapsed() / iters;
+        eprintln!("lsat_readiness avg latency over {iters} runs: {per:?}");
+        assert!(
+            per.as_millis() < 100,
+            "readiness scoring unexpectedly slow: {per:?}"
+        );
+    }
+
+    #[test]
+    fn readiness_unlocks_and_projects_120_180() {
+        // All three give-up conditions satisfied, ~75% accuracy.
+        let n = MIN_GRADED_PRACTICE_FOR_READINESS;
+        let correct = n * 3 / 4;
+        let cov = coverage_from_attempts(&attempts(n, correct, LR_TAXONOMY.len(), 5));
+        assert!(cov.lr_coverage >= MIN_LR_COVERAGE_FOR_READINESS);
+        assert!(cov.rc_passages >= MIN_RC_PASSAGES_FOR_READINESS);
+        let mut outcomes = vec![true; correct];
+        outcomes.extend(vec![false; n - correct]);
+        let perf = performance_score(&outcomes);
+        let score = readiness_score(&cov, &perf);
+        assert!(score.available);
+        // Projection stays on the real LSAT scale, with an honest ordered range.
+        assert!(score.estimate >= 120.0 && score.estimate <= 180.0);
+        assert!(score.low <= score.estimate && score.estimate <= score.high);
+        assert!(score.high <= 180.0 && score.low >= 120.0);
     }
 }
