@@ -19,7 +19,21 @@ export async function postProto<T>(
         return outputType.fromBinary(outputBytes);
     } catch (err) {
         const { alertOnError = true } = options;
-        if (alertOnError && !(err instanceof Error && err.message === "500: Interrupted")) {
+        // Transient connectivity failures (fetch rejects with a TypeError like
+        // "Failed to fetch") are not actionable by the user and pop up a jarring
+        // native dialog in embedded WebViews — swallow the dialog but still
+        // rethrow so callers can handle/retry. Real backend errors still alert.
+        const isNetworkError =
+            err instanceof TypeError
+            || (err instanceof Error
+                && /failed to fetch|networkerror|load failed|network request failed/i.test(
+                    err.message,
+                ));
+        if (
+            alertOnError
+            && !isNetworkError
+            && !(err instanceof Error && err.message === "500: Interrupted")
+        ) {
             alert(err);
         }
         throw err;

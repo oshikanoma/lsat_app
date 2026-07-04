@@ -277,7 +277,7 @@ def _sync_soon() -> None:
 
     def _go() -> None:
         try:
-            mw.on_sync_button_clicked()
+            _run_quiet_sync(mw)
         except Exception:
             pass
 
@@ -323,15 +323,7 @@ def _install_auto_sync(mw: aqt.AnkiQt) -> None:
     def _on_finish() -> None:
         global _SYNC_ACTIVE
         _SYNC_ACTIVE = False
-        # If we're on the home screen and the sync changed the collection, redraw
-        # so freshly pulled data (coins, name, stats…) is reflected immediately.
-        if mw.state == "lsatHome" and mw.col is not None:
-            try:
-                changed = mw.col.mod != _LAST_HOME_MOD
-            except Exception:
-                changed = True
-            if changed:
-                mw.moveToState("lsatHome")
+        _redraw_home_if_changed(mw)
 
     gui_hooks.sync_will_start.append(_mark_start)
     gui_hooks.sync_did_finish.append(_on_finish)
@@ -349,10 +341,61 @@ def _auto_sync_tick(mw: aqt.AnkiQt) -> None:
         or mw.pm.sync_auth() is None
     ):
         return
-    try:
-        mw.on_sync_button_clicked()
-    except Exception:
-        pass
+    _run_quiet_sync(mw)
+
+
+def _redraw_home_if_changed(mw: aqt.AnkiQt) -> None:
+    """Redraw the LSAT home screen if a sync changed the collection, so freshly
+    pulled data (coins, name, stats…) appears immediately. No-op elsewhere."""
+    if mw.state == "lsatHome" and mw.col is not None:
+        try:
+            changed = mw.col.mod != _LAST_HOME_MOD
+        except Exception:
+            changed = True
+        if changed:
+            mw.moveToState("lsatHome")
+
+
+def _run_quiet_sync(mw: aqt.AnkiQt) -> None:
+    """Sync with AnkiWeb in the background WITHOUT the "Checking…" progress
+    dialog or the "Collection sync complete" tooltip.
+
+    Used for the automatic syncs (after coin-earning actions and the periodic
+    home-screen pull) so cross-device progress stays live without popping up UI
+    after every action. It performs the same normal two-way sync as the Sync
+    button, just silently; if the server reports a diverged collection (a full
+    sync is required), it stays quiet and leaves that to the manual Sync button.
+    Runs on Anki's serialized collection executor and is guarded by _SYNC_ACTIVE
+    so automatic syncs never overlap each other or a manual sync.
+    """
+    global _SYNC_ACTIVE
+    auth = mw.pm.sync_auth()
+    if auth is None or mw.col is None or _SYNC_ACTIVE:
+        return
+    _SYNC_ACTIVE = True
+
+    def task() -> Any:
+        return mw.col.sync_collection(auth, mw.pm.media_syncing_enabled())
+
+    def done(fut: Any) -> None:
+        global _SYNC_ACTIVE
+        try:
+            mw.col._load_scheduler()
+            out = fut.result()
+            mw.pm.set_host_number(out.host_number)
+            if out.new_endpoint:
+                mw.pm.set_current_sync_url(out.new_endpoint)
+            # Only a completed normal sync (NO_CHANGES) is handled silently; a
+            # diverged full sync is deliberately deferred to the manual button.
+            if out.required == out.NO_CHANGES:
+                _redraw_home_if_changed(mw)
+        except Exception:
+            # Auto-sync must stay quiet — surface nothing on failure.
+            pass
+        finally:
+            _SYNC_ACTIVE = False
+
+    mw.taskman.run_in_background(task, done)
 
 
 def _home_payload(mw: aqt.AnkiQt) -> dict[str, Any]:
