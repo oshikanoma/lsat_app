@@ -60,7 +60,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 <h1>All caught up.</h1>
                 <p>
                     No vocab due right now.
-                    {#if reviewed}You reviewed <b>{reviewed}</b> this session.{/if}
+                    {#if reviewed}You reviewed <b>{reviewed}</b>
+                         this session.{/if}
                 </p>
                 <p class="hint">FSRS will resurface these when it's time.</p>
                 <button class="cta" on:click={exit}>Back to home</button>
@@ -82,9 +83,15 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         {/if}
                     </div>
                     <div class="grade">
-                        <button class="g again" on:click={() => grade("again")}>Again</button>
-                        <button class="g good" on:click={() => grade("good")}>Good</button>
-                        <button class="g easy" on:click={() => grade("easy")}>Easy</button>
+                        <button class="g again" on:click={() => grade("again")}>
+                            Again
+                        </button>
+                        <button class="g good" on:click={() => grade("good")}>
+                            Good
+                        </button>
+                        <button class="g easy" on:click={() => grade("easy")}>
+                            Easy
+                        </button>
                     </div>
                 {/if}
             </article>
@@ -111,7 +118,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         background: var(--beige);
         color: var(--ink);
         font-size: 15px;
-        font-family: "Jost", -apple-system, "Segoe UI", system-ui, sans-serif;
+        font-family:
+            "Jost",
+            -apple-system,
+            "Segoe UI",
+            system-ui,
+            sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
@@ -209,7 +221,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         color: var(--beige);
         background: var(--maroon);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &:hover {
             background: #7f2230;
             transform: translateY(-1px);
@@ -233,7 +247,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         border: 2px solid var(--beige-deep);
         background: var(--beige);
-        transition: border-color 120ms ease, background 120ms ease, transform 80ms ease;
+        transition:
+            border-color 120ms ease,
+            background 120ms ease,
+            transform 80ms ease;
         &:hover {
             transform: translateY(-1px);
         }

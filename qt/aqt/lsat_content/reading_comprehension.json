@@ -1,97 +1,97 @@
 {
-  "section": "RC",
-  "version": 1,
-  "items": [
-    {
-      "id": "rc-0001",
-      "section": "RC",
-      "topic": "natural science",
-      "difficulty": 3,
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "passage": "Among the most striking abilities in the animal kingdom is the octopus's capacity to change the color and texture of its skin almost instantaneously, blending into coral, sand, or rock with a fidelity that can deceive both predators and prey. What makes this feat especially remarkable is that octopuses are, by most measures, colorblind: the photoreceptors in their eyes detect brightness but not wavelength. How an animal that apparently cannot see color can nonetheless match it so precisely has puzzled biologists for decades.\n\nPart of the answer lies in the skin itself. An octopus's skin is studded with tiny pigment-filled organs called chromatophores, each surrounded by muscles that expand or contract to reveal or conceal the pigment. Beneath these sit reflective cells that scatter and bend light. Crucially, recent research suggests that the skin may contain light-sensitive proteins of the same kind found in the eye, raising the possibility that an octopus's skin can, in a limited sense, detect the light around it and respond without waiting for instructions from the brain.\n\nThis hypothesis fits a broader and increasingly accepted picture of octopus biology: that cognition in these animals is not centralized but distributed. Roughly two-thirds of an octopus's neurons lie not in its central brain but in its arms, each of which can taste, touch, and react with a striking degree of independence. An arm severed from the body will, for a time, continue to reach toward food. Camouflage, on this view, may be less a single decision issued from a command center than the coordinated output of many semi-autonomous systems.\n\nThe implications reach beyond marine biology. Researchers in robotics and materials science have begun to study octopus skin as a model for adaptive surfaces, and philosophers of mind have seized on the octopus as a test case for theories of consciousness that assume a single, unified locus of experience. If an animal can solve a problem as complex as real-time camouflage without centralized control, then some of our most basic intuitions about how intelligence must be organized may be parochial: true of vertebrates like us, but not of intelligence as such.",
-      "questions": [
+    "section": "RC",
+    "version": 1,
+    "items": [
         {
-          "id": "rc-0001-q1",
-          "section": "RC",
-          "question_type": "Main Point",
-          "difficulty": 2,
-          "stem": "Which one of the following most accurately expresses the main point of the passage?",
-          "choices": {
-            "A": "Because octopuses are colorblind, their celebrated ability to camouflage has been greatly exaggerated by biologists.",
-            "B": "The octopus's ability to camouflage despite being colorblind is best understood in light of evidence that its cognition is distributed rather than centralized, a conclusion with implications beyond biology.",
-            "C": "The chromatophores in an octopus's skin are controlled entirely by reflective cells that bend and scatter light.",
-            "D": "Robotics researchers have successfully reproduced octopus skin in the design of adaptive surfaces.",
-            "E": "Philosophers of mind have shown that octopuses possess a unified locus of conscious experience."
-          },
-          "answer": "B",
-          "explanation": "The passage poses the puzzle of color-matching by a colorblind animal, answers it by appeal to skin-level light sensitivity and distributed cognition, and closes with implications beyond biology. (B) captures this arc. (A) and (E) contradict the passage; (C) overstates one detail; (D) describes an area of study, not the main point."
-        },
-        {
-          "id": "rc-0001-q2",
-          "section": "RC",
-          "question_type": "Inference",
-          "difficulty": 3,
-          "stem": "The passage most strongly suggests that which one of the following is true of an octopus's arms?",
-          "choices": {
-            "A": "They contain all of the animal's photoreceptors.",
-            "B": "They can respond to stimuli with some degree of independence from the central brain.",
-            "C": "They are incapable of functioning once separated from the body.",
-            "D": "They contain no neurons of their own.",
-            "E": "They control the animal's vision."
-          },
-          "answer": "B",
-          "explanation": "The passage states that about two-thirds of an octopus's neurons are in its arms, which can taste, touch, and react independently, and that a severed arm keeps reaching for food. That supports (B). (C) and (D) contradict the text; (A) and (E) are unsupported."
-        },
-        {
-          "id": "rc-0001-q3",
-          "section": "RC",
-          "question_type": "Detail",
-          "difficulty": 1,
-          "stem": "According to the passage, chromatophores are",
-          "choices": {
-            "A": "light-sensitive proteins identical to those found in the brain.",
-            "B": "reflective cells that scatter and bend light beneath the skin.",
-            "C": "pigment-filled organs surrounded by muscles that reveal or conceal the pigment.",
-            "D": "neurons located primarily in the octopus's arms.",
-            "E": "the photoreceptors responsible for detecting brightness."
-          },
-          "answer": "C",
-          "explanation": "The second paragraph defines chromatophores as pigment-filled organs surrounded by muscles that expand or contract to reveal or conceal the pigment (C). The other choices describe different structures mentioned in the passage."
-        },
-        {
-          "id": "rc-0001-q4",
-          "section": "RC",
-          "question_type": "Function",
-          "difficulty": 3,
-          "stem": "The author refers to philosophers of mind in the final paragraph primarily in order to",
-          "choices": {
-            "A": "concede that the distributed-cognition hypothesis has been refuted.",
-            "B": "illustrate that the octopus challenges assumptions reaching beyond biology, including about how intelligence must be organized.",
-            "C": "argue that consciousness requires a single, unified locus of experience.",
-            "D": "criticize robotics researchers for ignoring questions of consciousness.",
-            "E": "demonstrate that octopuses are more intelligent than vertebrates."
-          },
-          "answer": "B",
-          "explanation": "The final paragraph uses philosophers of mind (alongside robotics) to show the octopus's implications extend beyond marine biology to assumptions about the organization of intelligence (B). (A), (C), (D), and (E) misstate the author's purpose or position."
-        },
-        {
-          "id": "rc-0001-q5",
-          "section": "RC",
-          "question_type": "Inference",
-          "difficulty": 2,
-          "stem": "The passage indicates that the puzzle that has occupied biologists arises because",
-          "choices": {
-            "A": "octopuses can match colors precisely even though their eyes do not detect wavelength.",
-            "B": "octopuses change texture more quickly than they change color.",
-            "C": "octopuses lose the ability to camouflage as they age.",
-            "D": "octopuses' arms operate independently of one another.",
-            "E": "octopuses rely on reflective cells rather than pigment to produce color."
-          },
-          "answer": "A",
-          "explanation": "The first paragraph frames the puzzle as how a colorblind animal (one whose eyes detect brightness but not wavelength) can match colors so precisely (A). The other choices are either unstated or contradict the passage."
+            "id": "rc-0001",
+            "section": "RC",
+            "topic": "natural science",
+            "difficulty": 3,
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "passage": "Among the most striking abilities in the animal kingdom is the octopus's capacity to change the color and texture of its skin almost instantaneously, blending into coral, sand, or rock with a fidelity that can deceive both predators and prey. What makes this feat especially remarkable is that octopuses are, by most measures, colorblind: the photoreceptors in their eyes detect brightness but not wavelength. How an animal that apparently cannot see color can nonetheless match it so precisely has puzzled biologists for decades.\n\nPart of the answer lies in the skin itself. An octopus's skin is studded with tiny pigment-filled organs called chromatophores, each surrounded by muscles that expand or contract to reveal or conceal the pigment. Beneath these sit reflective cells that scatter and bend light. Crucially, recent research suggests that the skin may contain light-sensitive proteins of the same kind found in the eye, raising the possibility that an octopus's skin can, in a limited sense, detect the light around it and respond without waiting for instructions from the brain.\n\nThis hypothesis fits a broader and increasingly accepted picture of octopus biology: that cognition in these animals is not centralized but distributed. Roughly two-thirds of an octopus's neurons lie not in its central brain but in its arms, each of which can taste, touch, and react with a striking degree of independence. An arm severed from the body will, for a time, continue to reach toward food. Camouflage, on this view, may be less a single decision issued from a command center than the coordinated output of many semi-autonomous systems.\n\nThe implications reach beyond marine biology. Researchers in robotics and materials science have begun to study octopus skin as a model for adaptive surfaces, and philosophers of mind have seized on the octopus as a test case for theories of consciousness that assume a single, unified locus of experience. If an animal can solve a problem as complex as real-time camouflage without centralized control, then some of our most basic intuitions about how intelligence must be organized may be parochial: true of vertebrates like us, but not of intelligence as such.",
+            "questions": [
+                {
+                    "id": "rc-0001-q1",
+                    "section": "RC",
+                    "question_type": "Main Point",
+                    "difficulty": 2,
+                    "stem": "Which one of the following most accurately expresses the main point of the passage?",
+                    "choices": {
+                        "A": "Because octopuses are colorblind, their celebrated ability to camouflage has been greatly exaggerated by biologists.",
+                        "B": "The octopus's ability to camouflage despite being colorblind is best understood in light of evidence that its cognition is distributed rather than centralized, a conclusion with implications beyond biology.",
+                        "C": "The chromatophores in an octopus's skin are controlled entirely by reflective cells that bend and scatter light.",
+                        "D": "Robotics researchers have successfully reproduced octopus skin in the design of adaptive surfaces.",
+                        "E": "Philosophers of mind have shown that octopuses possess a unified locus of conscious experience."
+                    },
+                    "answer": "B",
+                    "explanation": "The passage poses the puzzle of color-matching by a colorblind animal, answers it by appeal to skin-level light sensitivity and distributed cognition, and closes with implications beyond biology. (B) captures this arc. (A) and (E) contradict the passage; (C) overstates one detail; (D) describes an area of study, not the main point."
+                },
+                {
+                    "id": "rc-0001-q2",
+                    "section": "RC",
+                    "question_type": "Inference",
+                    "difficulty": 3,
+                    "stem": "The passage most strongly suggests that which one of the following is true of an octopus's arms?",
+                    "choices": {
+                        "A": "They contain all of the animal's photoreceptors.",
+                        "B": "They can respond to stimuli with some degree of independence from the central brain.",
+                        "C": "They are incapable of functioning once separated from the body.",
+                        "D": "They contain no neurons of their own.",
+                        "E": "They control the animal's vision."
+                    },
+                    "answer": "B",
+                    "explanation": "The passage states that about two-thirds of an octopus's neurons are in its arms, which can taste, touch, and react independently, and that a severed arm keeps reaching for food. That supports (B). (C) and (D) contradict the text; (A) and (E) are unsupported."
+                },
+                {
+                    "id": "rc-0001-q3",
+                    "section": "RC",
+                    "question_type": "Detail",
+                    "difficulty": 1,
+                    "stem": "According to the passage, chromatophores are",
+                    "choices": {
+                        "A": "light-sensitive proteins identical to those found in the brain.",
+                        "B": "reflective cells that scatter and bend light beneath the skin.",
+                        "C": "pigment-filled organs surrounded by muscles that reveal or conceal the pigment.",
+                        "D": "neurons located primarily in the octopus's arms.",
+                        "E": "the photoreceptors responsible for detecting brightness."
+                    },
+                    "answer": "C",
+                    "explanation": "The second paragraph defines chromatophores as pigment-filled organs surrounded by muscles that expand or contract to reveal or conceal the pigment (C). The other choices describe different structures mentioned in the passage."
+                },
+                {
+                    "id": "rc-0001-q4",
+                    "section": "RC",
+                    "question_type": "Function",
+                    "difficulty": 3,
+                    "stem": "The author refers to philosophers of mind in the final paragraph primarily in order to",
+                    "choices": {
+                        "A": "concede that the distributed-cognition hypothesis has been refuted.",
+                        "B": "illustrate that the octopus challenges assumptions reaching beyond biology, including about how intelligence must be organized.",
+                        "C": "argue that consciousness requires a single, unified locus of experience.",
+                        "D": "criticize robotics researchers for ignoring questions of consciousness.",
+                        "E": "demonstrate that octopuses are more intelligent than vertebrates."
+                    },
+                    "answer": "B",
+                    "explanation": "The final paragraph uses philosophers of mind (alongside robotics) to show the octopus's implications extend beyond marine biology to assumptions about the organization of intelligence (B). (A), (C), (D), and (E) misstate the author's purpose or position."
+                },
+                {
+                    "id": "rc-0001-q5",
+                    "section": "RC",
+                    "question_type": "Inference",
+                    "difficulty": 2,
+                    "stem": "The passage indicates that the puzzle that has occupied biologists arises because",
+                    "choices": {
+                        "A": "octopuses can match colors precisely even though their eyes do not detect wavelength.",
+                        "B": "octopuses change texture more quickly than they change color.",
+                        "C": "octopuses lose the ability to camouflage as they age.",
+                        "D": "octopuses' arms operate independently of one another.",
+                        "E": "octopuses rely on reflective cells rather than pigment to produce color."
+                    },
+                    "answer": "A",
+                    "explanation": "The first paragraph frames the puzzle as how a colorblind animal (one whose eyes detect brightness but not wavelength) can match colors so precisely (A). The other choices are either unstated or contradict the passage."
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

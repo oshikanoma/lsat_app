@@ -126,7 +126,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 placeholder="Your name"
                 on:keydown={(e) => e.key === "Enter" && name.trim() && (step = "date")}
             />
-            <button class="cta" disabled={!name.trim()} on:click={() => (step = "date")}>
+            <button
+                class="cta"
+                disabled={!name.trim()}
+                on:click={() => (step = "date")}
+            >
                 Continue
             </button>
         </div>
@@ -135,13 +139,23 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             <span class="step">Step 2 of 3</span>
             <h1>When are you starting?</h1>
             <p class="sub">
-                We'll map out a plan: <b>2 hours a day for 8 months</b>.
+                We'll map out a plan: <b>2 hours a day for 8 months</b>
+                .
             </p>
             <input class="field" type="date" bind:value={startDate} />
             <div class="plan-preview">
-                <div><span class="pk">Daily</span> 2 hours</div>
-                <div><span class="pk">Length</span> 8 months (~240 days)</div>
-                <div><span class="pk">Target date</span> {planEnd(startDate)}</div>
+                <div>
+                    <span class="pk">Daily</span>
+                     2 hours
+                </div>
+                <div>
+                    <span class="pk">Length</span>
+                     8 months (~240 days)
+                </div>
+                <div>
+                    <span class="pk">Target date</span>
+                    {planEnd(startDate)}
+                </div>
             </div>
             <div class="row">
                 <button class="ghost" on:click={() => (step = "name")}>Back</button>
@@ -150,7 +164,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         </div>
     {:else if step === "diag" && current}
         <div class="card wide">
-            <span class="step">Step 3 of 3 · Diagnostic · {qIndex + 1}/{questions.length}</span>
+            <span class="step">
+                Step 3 of 3 · Diagnostic · {qIndex + 1}/{questions.length}
+            </span>
             <h1 class="diag-h">Let's see where you're starting</h1>
             <div class="qsection">{current.sectionLabel}</div>
             {#if current.stimulus}
@@ -161,9 +177,13 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 {#each current.choices as c}
                     <button
                         class="choice"
-                        class:correct={picked && c.letter.toUpperCase() === current.answer.toUpperCase()}
-                        class:wrong={picked === c.letter && c.letter.toUpperCase() !== current.answer.toUpperCase()}
-                        class:dim={picked && picked !== c.letter && c.letter.toUpperCase() !== current.answer.toUpperCase()}
+                        class:correct={picked &&
+                            c.letter.toUpperCase() === current.answer.toUpperCase()}
+                        class:wrong={picked === c.letter &&
+                            c.letter.toUpperCase() !== current.answer.toUpperCase()}
+                        class:dim={picked &&
+                            picked !== c.letter &&
+                            c.letter.toUpperCase() !== current.answer.toUpperCase()}
                         disabled={!!picked}
                         on:click={() => pick(c.letter)}
                     >
@@ -173,7 +193,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 {/each}
             </div>
             {#if picked}
-                <div class="feedback" class:good={pickedCorrect} class:bad={!pickedCorrect}>
+                <div
+                    class="feedback"
+                    class:good={pickedCorrect}
+                    class:bad={!pickedCorrect}
+                >
                     <b>{pickedCorrect ? "Correct" : `Answer: ${current.answer}`}</b>
                     {#if current.explanation}<p>{current.explanation}</p>{/if}
                     <button class="cta" on:click={nextQuestion}>
@@ -212,7 +236,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         align-items: flex-start;
         justify-content: center;
         padding: 2.5rem 1.25rem;
-        font-family: "Jost", -apple-system, "Segoe UI", system-ui, sans-serif;
+        font-family:
+            "Jost",
+            -apple-system,
+            "Segoe UI",
+            system-ui,
+            sans-serif;
         color: var(--ink);
     }
 
@@ -301,7 +330,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         color: var(--beige);
         background: var(--maroon);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &:hover:not(:disabled) {
             background: #7f2230;
             transform: translateY(-1px);

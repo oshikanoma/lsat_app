@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 import aqt
+from anki.cards import CardId
 from anki.collection import Collection
 from aqt.operations import QueryOp
 from aqt.qt import (
@@ -155,7 +156,9 @@ def _add_vocab_card(col: Collection, item: dict[str, Any]) -> None:
     col.add_note(note, deck_id)
 
 
-def _ensure_word_of_the_day(col: Collection, *, force: bool = False) -> dict[str, Any] | None:
+def _ensure_word_of_the_day(
+    col: Collection, *, force: bool = False
+) -> dict[str, Any] | None:
     """Add at most one new vocab word per calendar day.
 
     With `force=True`, add the next unused word immediately (used by the
@@ -215,7 +218,9 @@ def _fill_blank(stem: str, word: str) -> str:
     return filled if filled != stem else f"{stem} {word}."
 
 
-def _word_entry(item: dict[str, Any], distractor: dict[str, Any] | None) -> dict[str, Any]:
+def _word_entry(
+    item: dict[str, Any], distractor: dict[str, Any] | None
+) -> dict[str, Any]:
     """A learned-word card plus a two-sentence 'which uses it correctly?' quiz.
 
     The correct sentence is the word's real example; the wrong sentence drops
@@ -421,7 +426,9 @@ def _home_payload(mw: aqt.AnkiQt) -> dict[str, Any]:
 
     learned = [by_name[name] for name in added if name in by_name]
     word_entries = [
-        _word_entry(item, words[(words.index(item) + 1) % len(words)] if words else None)
+        _word_entry(
+            item, words[(words.index(item) + 1) % len(words)] if words else None
+        )
         for item in learned
     ]
 
@@ -535,7 +542,7 @@ class LsatHome:
         # from another device appear on their own (installed once).
         _install_auto_sync(self.mw)
 
-    def _on_cmd(self, cmd: str) -> Any:
+    def _on_cmd(self, cmd: str) -> Any:  # noqa: PLR0911
         mw = self.mw
         if cmd == "lsat:home":
             return _home_payload(mw)
@@ -560,7 +567,9 @@ class LsatHome:
             # behave identically; by the time we get here the user has confirmed.
             _sign_out(mw)
             mw.toolbar.redraw()
-            tooltip("Signed out. Your progress is saved to your account — sign back in to restore it.")
+            tooltip(
+                "Signed out. Your progress is saved to your account — sign back in to restore it."
+            )
             return _home_payload(mw)
         if cmd == "lsat:onboard:questions":
             return {"questions": _diagnostic_questions()}
@@ -591,7 +600,9 @@ class LsatHome:
             upgrade_id = cmd.rsplit(":", 1)[-1]
             result = _buy_upgrade(mw.col, upgrade_id)
             if not result.get("ok") and result.get("reason") == "coins":
-                tooltip("Not enough coins yet — earn more in a lesson or the Socratic Station.")
+                tooltip(
+                    "Not enough coins yet — earn more in a lesson or the Socratic Station."
+                )
             return _home_payload(mw)
         if cmd.startswith("lsat:practice:"):
             parts = cmd.split(":")
@@ -632,19 +643,84 @@ COINS_PER_SOCRATIC_CORRECT = 500
 # Homebase upgrades: coins earned in lessons/Socratic are poured into the house.
 # Each id maps to a visual layer on the floating-island house in the UI.
 HOUSE_UPGRADES = [
-    {"id": "garden", "name": "Greenery", "desc": "Shrubs and a little tree on your island.", "cost": 500},
-    {"id": "hedges", "name": "Hedge border", "desc": "A trimmed hedge around the island rim.", "cost": 800},
-    {"id": "orchard", "name": "Garden", "desc": "A real garden with fruit and vegetable beds.", "cost": 1000},
-    {"id": "path", "name": "Stone path", "desc": "A tidy walkway out to the island edge.", "cost": 1200},
-    {"id": "flag", "name": "Rooftop banner", "desc": "A maroon pennant flying from the peak.", "cost": 1500},
-    {"id": "lights", "name": "Warm lights", "desc": "Shutters and a warm glow across the island.", "cost": 2000},
-    {"id": "lamps", "name": "Lamp posts", "desc": "Lanterns lining both sides of the path.", "cost": 2800},
-    {"id": "pond", "name": "Reflecting pond", "desc": "A calm little pond on the island.", "cost": 3500},
-    {"id": "fountain", "name": "Fountain", "desc": "A bubbling stone fountain on the lawn.", "cost": 4500},
-    {"id": "tower", "name": "Study tower", "desc": "A second story for late-night prep.", "cost": 6000},
-    {"id": "balloon", "name": "Hot-air balloon", "desc": "A balloon drifting past your homebase.", "cost": 7500},
-    {"id": "observatory", "name": "Observatory", "desc": "A rooftop dome to watch the stars.", "cost": 10000},
-    {"id": "aurora", "name": "Sunset sky", "desc": "Bathe the sky in a purple-to-gold sunset.", "cost": 18000},
+    {
+        "id": "garden",
+        "name": "Greenery",
+        "desc": "Shrubs and a little tree on your island.",
+        "cost": 500,
+    },
+    {
+        "id": "hedges",
+        "name": "Hedge border",
+        "desc": "A trimmed hedge around the island rim.",
+        "cost": 800,
+    },
+    {
+        "id": "orchard",
+        "name": "Garden",
+        "desc": "A real garden with fruit and vegetable beds.",
+        "cost": 1000,
+    },
+    {
+        "id": "path",
+        "name": "Stone path",
+        "desc": "A tidy walkway out to the island edge.",
+        "cost": 1200,
+    },
+    {
+        "id": "flag",
+        "name": "Rooftop banner",
+        "desc": "A maroon pennant flying from the peak.",
+        "cost": 1500,
+    },
+    {
+        "id": "lights",
+        "name": "Warm lights",
+        "desc": "Shutters and a warm glow across the island.",
+        "cost": 2000,
+    },
+    {
+        "id": "lamps",
+        "name": "Lamp posts",
+        "desc": "Lanterns lining both sides of the path.",
+        "cost": 2800,
+    },
+    {
+        "id": "pond",
+        "name": "Reflecting pond",
+        "desc": "A calm little pond on the island.",
+        "cost": 3500,
+    },
+    {
+        "id": "fountain",
+        "name": "Fountain",
+        "desc": "A bubbling stone fountain on the lawn.",
+        "cost": 4500,
+    },
+    {
+        "id": "tower",
+        "name": "Study tower",
+        "desc": "A second story for late-night prep.",
+        "cost": 6000,
+    },
+    {
+        "id": "balloon",
+        "name": "Hot-air balloon",
+        "desc": "A balloon drifting past your homebase.",
+        "cost": 7500,
+    },
+    {
+        "id": "observatory",
+        "name": "Observatory",
+        "desc": "A rooftop dome to watch the stars.",
+        "cost": 10000,
+    },
+    {
+        "id": "aurora",
+        "name": "Sunset sky",
+        "desc": "Bathe the sky in a purple-to-gold sunset.",
+        "cost": 18000,
+    },
 ]
 
 
@@ -758,7 +834,14 @@ def _ensure_mcq_notetype(col: Collection) -> Any:
     m = col.models.by_name(MCQ_NOTETYPE)
     if m is None:
         m = col.models.new(MCQ_NOTETYPE)
-        for fname in ["Stimulus", "Question", *_LETTERS, "Answer", "Explanation", "Section"]:
+        for fname in [
+            "Stimulus",
+            "Question",
+            *_LETTERS,
+            "Answer",
+            "Explanation",
+            "Section",
+        ]:
             col.models.add_field(m, col.models.new_field(fname))
         template = col.models.new_template("Card 1")
         template["qfmt"] = _MCQ_QFMT
@@ -931,7 +1014,9 @@ def _lr_question_type(stimulus: str, stem: str) -> str | None:
                     _LR_TYPE_BY_QUESTION[key] = qt
             except (OSError, ValueError):
                 pass
-    return _LR_TYPE_BY_QUESTION.get(f"{(stimulus or '').strip()}\x1f{(stem or '').strip()}")
+    return _LR_TYPE_BY_QUESTION.get(
+        f"{(stimulus or '').strip()}\x1f{(stem or '').strip()}"
+    )
 
 
 # --- onboarding profile + adaptive study plan ------------------------------
@@ -989,7 +1074,9 @@ def _shuffle_mcq(
     new_answer = answer
     for new_pos, old_idx in enumerate(order):
         old_letter, text = ordered[old_idx]
-        new_letter = _MCQ_LETTERS[new_pos] if new_pos < len(_MCQ_LETTERS) else old_letter
+        new_letter = (
+            _MCQ_LETTERS[new_pos] if new_pos < len(_MCQ_LETTERS) else old_letter
+        )
         new_choices.append({"letter": new_letter, "text": text})
         remap[old_letter] = new_letter
         if old_letter == answer:
@@ -1033,7 +1120,9 @@ def _diagnostic_questions(limit_per_section: int = 3) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     lr_path = content_dir / "logical_reasoning.json"
     if lr_path.exists():
-        for item in json.loads(lr_path.read_text()).get("items", [])[:limit_per_section]:
+        for item in json.loads(lr_path.read_text()).get("items", [])[
+            :limit_per_section
+        ]:
             out.append(_mcq_from_item(item, "lr", item.get("stimulus", "")))
     rc_path = content_dir / "reading_comprehension.json"
     if rc_path.exists():
@@ -1168,6 +1257,16 @@ def _type_breakdown(col: Collection) -> list[dict[str, Any]]:
     return out
 
 
+def _v3_sched(col: Collection) -> Any:
+    """The active V3 scheduler, returned as ``Any`` for type-checkers.
+
+    The app always runs on the V3 scheduler (which has ``get_queued_cards``,
+    ``build_answer``, ``answer_card`` and friends); the ``DummyScheduler`` only
+    appears before a collection is loaded, which never happens on these code
+    paths. Narrowing here keeps mypy happy without scattering casts."""
+    return col.sched
+
+
 def _weakest_type_index(col: Collection, cards: list[Any]) -> int:
     """Index of the queued card whose LR type most needs practice.
 
@@ -1297,11 +1396,11 @@ class LsatPractice:
         # For LR, prefetch a few due cards and steer toward the learner's weakest
         # question type; RC stays plain-scheduler order for now.
         limit = 8 if section == "lr" else 1
-        queued = col.sched.get_queued_cards(fetch_limit=limit)
+        queued = _v3_sched(col).get_queued_cards(fetch_limit=limit)
         if not queued.cards:
             return None
         idx = (
-            _weakest_type_index(col, queued.cards)
+            _weakest_type_index(col, list(queued.cards))
             if section == "lr" and len(queued.cards) > 1
             else 0
         )
@@ -1387,7 +1486,9 @@ class LsatPractice:
         col = self.mw.col
         # Coverage metadata for the readiness give-up rule: LR question type
         # (resolved from content) and, for RC, the passage the question came from.
-        question_type = _lr_question_type(stimulus, question) if section == "lr" else None
+        question_type = (
+            _lr_question_type(stimulus, question) if section == "lr" else None
+        )
         passage = stimulus if section == "rc" else None
         _record_attempt(
             col,
@@ -1402,19 +1503,19 @@ class LsatPractice:
             self.correct += 1
             coins = COINS_PER_LESSON_CORRECT
             _add_coins(col, coins)
-        card = col.get_card(card_id)
+        card = col.get_card(CardId(card_id))
         card.start_timer()
         rating = CardAnswer.GOOD if correct else CardAnswer.AGAIN
-        built = col.sched.build_answer(card=card, states=states, rating=rating)
-        col.sched.answer_card(built)
+        built = _v3_sched(col).build_answer(card=card, states=states, rating=rating)
+        _v3_sched(col).answer_card(built)
         # The review is now recorded honestly for FSRS. Bury the card so the
         # lesson always advances to a *new* question instead of repeating this
         # one moments later (a wrong answer would otherwise re-enter the learning
         # queue and reappear within the session). It returns on schedule next day.
         try:
-            col.sched.bury_cards([card_id], manual=False)
+            _v3_sched(col).bury_cards([CardId(card_id)], manual=False)
         except TypeError:
-            col.sched.bury_cards([card_id])
+            _v3_sched(col).bury_cards([CardId(card_id)])
         self._current = None
         return {"ok": True, "correct": correct, "coins": coins}
 
@@ -1696,9 +1797,7 @@ class LsatSocratic:
             return {"done": True}
         # Exclude the question just shown so the same one never comes up twice in
         # a row (unless it's the only one available).
-        candidates = [x for x in self.pool if x is not self._current] or list(
-            self.pool
-        )
+        candidates = [x for x in self.pool if x is not self._current] or list(self.pool)
         random.shuffle(candidates)
         for q in candidates:
             wrong = [
@@ -1929,7 +2028,7 @@ class LsatVocabReview:
 
     def _next_card(self) -> dict[str, Any]:
         col = self.mw.col
-        queued = col.sched.get_queued_cards(fetch_limit=1)
+        queued = _v3_sched(col).get_queued_cards(fetch_limit=1)
         if not queued.cards:
             self._current = None
             return {"done": True}
@@ -1952,7 +2051,7 @@ class LsatVocabReview:
             return {"ok": False}
         card_id, states = self._current
         col = self.mw.col
-        card = col.get_card(card_id)
+        card = col.get_card(CardId(card_id))
         card.start_timer()
         rmap = {
             "again": CardAnswer.AGAIN,
@@ -1961,8 +2060,8 @@ class LsatVocabReview:
             "easy": CardAnswer.EASY,
         }
         rating = rmap.get(rating_name, CardAnswer.GOOD)
-        built = col.sched.build_answer(card=card, states=states, rating=rating)
-        col.sched.answer_card(built)
+        built = _v3_sched(col).build_answer(card=card, states=states, rating=rating)
+        _v3_sched(col).answer_card(built)
         self._current = None
         return {"ok": True}
 

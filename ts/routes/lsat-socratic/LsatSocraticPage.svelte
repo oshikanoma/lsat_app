@@ -377,10 +377,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         : "Tutor voice off — tap to unmute"}
                 >
                     <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-                        <path
-                            d="M4 9v6h4l5 4V5L8 9H4z"
-                            fill="currentColor"
-                        />
+                        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
                         {#if speakOn}
                             <path
                                 d="M16 8.5a4 4 0 0 1 0 7M18.5 6a7 7 0 0 1 0 12"
@@ -419,7 +416,13 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             <div class="depot">
                 <div class="scene">
                     <div class="train" class:parked={phase === "intro"}>
-                        <svg class="loco" viewBox="0 0 220 104" width="300" height="142" aria-hidden="true">
+                        <svg
+                            class="loco"
+                            viewBox="0 0 220 104"
+                            width="300"
+                            height="142"
+                            aria-hidden="true"
+                        >
                             <defs>
                                 <linearGradient id="boiler" x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="0" stop-color="#b23640" />
@@ -430,52 +433,289 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                     <stop offset="1" stop-color="#e0a83a" />
                                 </radialGradient>
                             </defs>
-                            <ellipse cx="112" cy="98" rx="104" ry="6" fill="rgba(74,13,24,0.18)" />
+                            <ellipse
+                                cx="112"
+                                cy="98"
+                                rx="104"
+                                ry="6"
+                                fill="rgba(74,13,24,0.18)"
+                            />
                             <!-- passenger car -->
-                            <rect x="6" y="34" width="72" height="10" rx="4" fill="#4a0d18" />
-                            <rect x="8" y="42" width="68" height="38" rx="7" fill="#7a1a29" />
-                            <rect x="16" y="50" width="20" height="17" rx="3" fill="url(#winglow)" />
-                            <rect x="46" y="50" width="20" height="17" rx="3" fill="url(#winglow)" />
-                            <rect x="8" y="74" width="68" height="6" fill="#c89b3c" opacity="0.8" />
-                            <rect x="76" y="66" width="10" height="5" rx="2" fill="#4a0d18" />
+                            <rect
+                                x="6"
+                                y="34"
+                                width="72"
+                                height="10"
+                                rx="4"
+                                fill="#4a0d18"
+                            />
+                            <rect
+                                x="8"
+                                y="42"
+                                width="68"
+                                height="38"
+                                rx="7"
+                                fill="#7a1a29"
+                            />
+                            <rect
+                                x="16"
+                                y="50"
+                                width="20"
+                                height="17"
+                                rx="3"
+                                fill="url(#winglow)"
+                            />
+                            <rect
+                                x="46"
+                                y="50"
+                                width="20"
+                                height="17"
+                                rx="3"
+                                fill="url(#winglow)"
+                            />
+                            <rect
+                                x="8"
+                                y="74"
+                                width="68"
+                                height="6"
+                                fill="#c89b3c"
+                                opacity="0.8"
+                            />
+                            <rect
+                                x="76"
+                                y="66"
+                                width="10"
+                                height="5"
+                                rx="2"
+                                fill="#4a0d18"
+                            />
                             <!-- locomotive -->
-                            <rect x="84" y="30" width="36" height="50" rx="7" fill="#8c1c2b" />
-                            <rect x="92" y="38" width="20" height="18" rx="3" fill="url(#winglow)" />
-                            <rect x="112" y="50" width="66" height="30" rx="15" fill="url(#boiler)" />
-                            <rect x="120" y="50" width="4" height="30" fill="#c89b3c" opacity="0.55" />
-                            <rect x="150" y="50" width="4" height="30" fill="#c89b3c" opacity="0.55" />
+                            <rect
+                                x="84"
+                                y="30"
+                                width="36"
+                                height="50"
+                                rx="7"
+                                fill="#8c1c2b"
+                            />
+                            <rect
+                                x="92"
+                                y="38"
+                                width="20"
+                                height="18"
+                                rx="3"
+                                fill="url(#winglow)"
+                            />
+                            <rect
+                                x="112"
+                                y="50"
+                                width="66"
+                                height="30"
+                                rx="15"
+                                fill="url(#boiler)"
+                            />
+                            <rect
+                                x="120"
+                                y="50"
+                                width="4"
+                                height="30"
+                                fill="#c89b3c"
+                                opacity="0.55"
+                            />
+                            <rect
+                                x="150"
+                                y="50"
+                                width="4"
+                                height="30"
+                                fill="#c89b3c"
+                                opacity="0.55"
+                            />
                             <path d="M132 50 a8 8 0 0 1 16 0 z" fill="#4a0d18" />
-                            <rect x="118" y="34" width="12" height="18" rx="1.5" fill="#4a0d18" />
-                            <polygon points="114,34 134,34 130,28 118,28" fill="#4a0d18" />
+                            <rect
+                                x="118"
+                                y="34"
+                                width="12"
+                                height="18"
+                                rx="1.5"
+                                fill="#4a0d18"
+                            />
+                            <polygon
+                                points="114,34 134,34 130,28 118,28"
+                                fill="#4a0d18"
+                            />
                             <circle cx="178" cy="65" r="15" fill="#6e1423" />
-                            <circle cx="178" cy="65" r="15" fill="none" stroke="#c89b3c" stroke-width="2" />
+                            <circle
+                                cx="178"
+                                cy="65"
+                                r="15"
+                                fill="none"
+                                stroke="#c89b3c"
+                                stroke-width="2"
+                            />
                             <circle cx="181" cy="60" r="4" fill="url(#winglow)" />
                             <polygon points="178,80 196,92 178,92" fill="#4a0d18" />
                             <!-- wheels -->
-                            <g class="wheel"><circle cx="24" cy="86" r="9" fill="#2c1b1e" /><circle cx="24" cy="86" r="9" fill="none" stroke="#c89b3c" stroke-width="1.6" /><line x1="24" y1="77" x2="24" y2="95" stroke="#c89b3c" stroke-width="1.4" /><line x1="15" y1="86" x2="33" y2="86" stroke="#c89b3c" stroke-width="1.4" /></g>
-                            <g class="wheel"><circle cx="60" cy="86" r="9" fill="#2c1b1e" /><circle cx="60" cy="86" r="9" fill="none" stroke="#c89b3c" stroke-width="1.6" /><line x1="60" y1="77" x2="60" y2="95" stroke="#c89b3c" stroke-width="1.4" /><line x1="51" y1="86" x2="69" y2="86" stroke="#c89b3c" stroke-width="1.4" /></g>
-                            <g class="wheel"><circle cx="120" cy="84" r="13" fill="#2c1b1e" /><circle cx="120" cy="84" r="13" fill="none" stroke="#c89b3c" stroke-width="2" /><line x1="120" y1="72" x2="120" y2="96" stroke="#c89b3c" stroke-width="1.6" /><line x1="108" y1="84" x2="132" y2="84" stroke="#c89b3c" stroke-width="1.6" /></g>
-                            <g class="wheel"><circle cx="152" cy="84" r="13" fill="#2c1b1e" /><circle cx="152" cy="84" r="13" fill="none" stroke="#c89b3c" stroke-width="2" /><line x1="152" y1="72" x2="152" y2="96" stroke="#c89b3c" stroke-width="1.6" /><line x1="140" y1="84" x2="164" y2="84" stroke="#c89b3c" stroke-width="1.6" /></g>
-                            <g class="wheel"><circle cx="180" cy="88" r="7" fill="#2c1b1e" /><circle cx="180" cy="88" r="7" fill="none" stroke="#c89b3c" stroke-width="1.4" /></g>
+                            <g class="wheel">
+                                <circle cx="24" cy="86" r="9" fill="#2c1b1e" />
+                                <circle
+                                    cx="24"
+                                    cy="86"
+                                    r="9"
+                                    fill="none"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="24"
+                                    y1="77"
+                                    x2="24"
+                                    y2="95"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.4"
+                                />
+                                <line
+                                    x1="15"
+                                    y1="86"
+                                    x2="33"
+                                    y2="86"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.4"
+                                />
+                            </g>
+                            <g class="wheel">
+                                <circle cx="60" cy="86" r="9" fill="#2c1b1e" />
+                                <circle
+                                    cx="60"
+                                    cy="86"
+                                    r="9"
+                                    fill="none"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="60"
+                                    y1="77"
+                                    x2="60"
+                                    y2="95"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.4"
+                                />
+                                <line
+                                    x1="51"
+                                    y1="86"
+                                    x2="69"
+                                    y2="86"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.4"
+                                />
+                            </g>
+                            <g class="wheel">
+                                <circle cx="120" cy="84" r="13" fill="#2c1b1e" />
+                                <circle
+                                    cx="120"
+                                    cy="84"
+                                    r="13"
+                                    fill="none"
+                                    stroke="#c89b3c"
+                                    stroke-width="2"
+                                />
+                                <line
+                                    x1="120"
+                                    y1="72"
+                                    x2="120"
+                                    y2="96"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="108"
+                                    y1="84"
+                                    x2="132"
+                                    y2="84"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                            </g>
+                            <g class="wheel">
+                                <circle cx="152" cy="84" r="13" fill="#2c1b1e" />
+                                <circle
+                                    cx="152"
+                                    cy="84"
+                                    r="13"
+                                    fill="none"
+                                    stroke="#c89b3c"
+                                    stroke-width="2"
+                                />
+                                <line
+                                    x1="152"
+                                    y1="72"
+                                    x2="152"
+                                    y2="96"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                                <line
+                                    x1="140"
+                                    y1="84"
+                                    x2="164"
+                                    y2="84"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.6"
+                                />
+                            </g>
+                            <g class="wheel">
+                                <circle cx="180" cy="88" r="7" fill="#2c1b1e" />
+                                <circle
+                                    cx="180"
+                                    cy="88"
+                                    r="7"
+                                    fill="none"
+                                    stroke="#c89b3c"
+                                    stroke-width="1.4"
+                                />
+                            </g>
                             <!-- smoke -->
                             <g class="smoke">
-                                <circle class="puff p1" cx="124" cy="26" r="6" fill="rgba(120,110,110,0.5)" />
-                                <circle class="puff p2" cx="124" cy="26" r="8" fill="rgba(120,110,110,0.4)" />
-                                <circle class="puff p3" cx="124" cy="26" r="10" fill="rgba(120,110,110,0.3)" />
+                                <circle
+                                    class="puff p1"
+                                    cx="124"
+                                    cy="26"
+                                    r="6"
+                                    fill="rgba(120,110,110,0.5)"
+                                />
+                                <circle
+                                    class="puff p2"
+                                    cx="124"
+                                    cy="26"
+                                    r="8"
+                                    fill="rgba(120,110,110,0.4)"
+                                />
+                                <circle
+                                    class="puff p3"
+                                    cx="124"
+                                    cy="26"
+                                    r="10"
+                                    fill="rgba(120,110,110,0.3)"
+                                />
                             </g>
                         </svg>
                     </div>
                 </div>
 
                 {#if phase === "intro"}
-                    <div class="depot-copy" in:fly={{ y: 22, duration: 500, delay: 120 }}>
+                    <div
+                        class="depot-copy"
+                        in:fly={{ y: 22, duration: 500, delay: 120 }}
+                    >
                         <span class="eyebrow">Now arriving</span>
                         <h1>Socratic Station</h1>
                         <p>
-                            The station flags one wrong answer choice. Your job is to explain the
-                            exact flaw that makes it wrong.
+                            The station flags one wrong answer choice. Your job is to
+                            explain the exact flaw that makes it wrong.
                         </p>
-                        <button class="cta big" on:click={getStarted}>Get started</button>
+                        <button class="cta big" on:click={getStarted}>
+                            Get started
+                        </button>
                     </div>
                 {/if}
             </div>
@@ -489,9 +729,18 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         {:else}
             <div class="chat">
                 <div class="bubble bot">
-                    <p class="lead">The <b>flagged</b> choice below is wrong. Talk it through with me and I'll help you pin down exactly <b>why</b> — I may ask you to clarify.</p>
+                    <p class="lead">
+                        The <b>flagged</b>
+                        choice below is wrong. Talk it through with me and I'll help you
+                        pin down exactly
+                        <b>why</b>
+                         — I may ask you to clarify.
+                    </p>
                     {#if q.stimulus}
-                        <button class="passage-toggle" on:click={() => (showPassage = !showPassage)}>
+                        <button
+                            class="passage-toggle"
+                            on:click={() => (showPassage = !showPassage)}
+                        >
                             {showPassage ? "Hide context" : "Show context"}
                         </button>
                         {#if showPassage}
@@ -505,7 +754,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                 <div
                                     class="choice"
                                     class:target={c.letter === q.wrongLetter}
-                                    class:correct={understood && c.letter === q.correctAnswer}
+                                    class:correct={understood &&
+                                        c.letter === q.correctAnswer}
                                 >
                                     <span class="letter">{c.letter}</span>
                                     <span class="ctext">{c.text}</span>
@@ -535,7 +785,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                 title="Play aloud"
                                 aria-label="Play this reply aloud"
                             >
-                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                <svg
+                                    viewBox="0 0 24 24"
+                                    width="14"
+                                    height="14"
+                                    aria-hidden="true"
+                                >
                                     <path d="M8 5v14l11-7z" fill="currentColor" />
                                 </svg>
                             </button>
@@ -545,12 +800,18 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 
                 {#if busy}
                     <div class="bubble bot typing" aria-label="Tutor is thinking">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
                     </div>
                 {/if}
 
                 {#if understood || concluded}
-                    <div class="bubble bot verdict" class:good={understood} class:bad={!understood}>
+                    <div
+                        class="bubble bot verdict"
+                        class:good={understood}
+                        class:bad={!understood}
+                    >
                         <p class="lead">
                             {understood
                                 ? "Nicely reasoned — coins added to your homebase."
@@ -566,11 +827,14 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                     {#if recording || transcribing || speaking}
                         <div class="voice-status" class:rec={recording}>
                             {#if recording}
-                                <span class="pulse"></span> Listening… tap the mic when you're done
+                                <span class="pulse"></span>
+                                 Listening… tap the mic when you're done
                             {:else if transcribing}
-                                <span class="spin"></span> Transcribing what you said…
+                                <span class="spin"></span>
+                                 Transcribing what you said…
                             {:else}
-                                <span class="pulse soft"></span> Tutor is speaking…
+                                <span class="pulse soft"></span>
+                                 Tutor is speaking…
                             {/if}
                         </div>
                     {/if}
@@ -588,20 +852,47 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                 <button
                                     class="mic"
                                     class:rec={recording}
-                                    disabled={busy || transcribing || understood || concluded}
+                                    disabled={busy ||
+                                        transcribing ||
+                                        understood ||
+                                        concluded}
                                     on:click={toggleRecording}
                                     title={recording
                                         ? "Stop and send"
                                         : "Talk it through out loud"}
                                 >
                                     {#if recording}
-                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                                            <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" />
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            width="18"
+                                            height="18"
+                                            aria-hidden="true"
+                                        >
+                                            <rect
+                                                x="7"
+                                                y="7"
+                                                width="10"
+                                                height="10"
+                                                rx="2"
+                                                fill="currentColor"
+                                            />
                                         </svg>
                                         Stop
                                     {:else}
-                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                                            <rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" />
+                                        <svg
+                                            viewBox="0 0 24 24"
+                                            width="18"
+                                            height="18"
+                                            aria-hidden="true"
+                                        >
+                                            <rect
+                                                x="9"
+                                                y="3"
+                                                width="6"
+                                                height="11"
+                                                rx="3"
+                                                fill="currentColor"
+                                            />
                                             <path
                                                 d="M6 11a6 6 0 0 0 12 0M12 17v3"
                                                 fill="none"
@@ -614,7 +905,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                                     {/if}
                                 </button>
                             {/if}
-                            <button class="pass" disabled={busy || recording} on:click={reveal}>
+                            <button
+                                class="pass"
+                                disabled={busy || recording}
+                                on:click={reveal}
+                            >
                                 Skip &amp; show me
                             </button>
                         </div>
@@ -652,7 +947,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         background: var(--beige);
         color: var(--ink);
         font-size: 15px;
-        font-family: "Jost", -apple-system, "Segoe UI", system-ui, sans-serif;
+        font-family:
+            "Jost",
+            -apple-system,
+            "Segoe UI",
+            system-ui,
+            sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
@@ -737,7 +1037,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         color: var(--beige);
         background: rgba(246, 237, 218, 0.12);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &.on {
             color: #fffdf6;
             background: rgba(200, 155, 60, 0.5);
@@ -758,7 +1060,6 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             opacity: 0.4;
         }
     }
-
 
     .stage {
         max-width: 44rem;
@@ -798,8 +1099,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         animation: chugin 2.6s cubic-bezier(0.17, 0.67, 0.24, 1) both;
     }
     @keyframes chugin {
-        from { transform: translateX(-135vw); }
-        to { transform: translateX(0); }
+        from {
+            transform: translateX(-135vw);
+        }
+        to {
+            transform: translateX(0);
+        }
     }
     .loco {
         display: block;
@@ -809,8 +1114,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         animation: enginebob 0.28s steps(2, end) infinite;
     }
     @keyframes enginebob {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(-1.5px); }
+        0% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-1.5px);
+        }
     }
     .wheel {
         transform-box: fill-box;
@@ -820,18 +1129,30 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         animation: roll 0.5s linear infinite;
     }
     @keyframes roll {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
     .puff {
         transform-box: fill-box;
         transform-origin: center;
         animation: puff 1.5s ease-out infinite;
     }
-    .puff.p2 { animation-delay: 0.4s; }
-    .puff.p3 { animation-delay: 0.8s; }
+    .puff.p2 {
+        animation-delay: 0.4s;
+    }
+    .puff.p3 {
+        animation-delay: 0.8s;
+    }
     @keyframes puff {
-        0% { opacity: 0.55; transform: translate(0, 0) scale(0.45); }
-        100% { opacity: 0; transform: translate(-26px, -42px) scale(1.7); }
+        0% {
+            opacity: 0.55;
+            transform: translate(0, 0) scale(0.45);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-26px, -42px) scale(1.7);
+        }
     }
 
     .depot-copy {
@@ -909,7 +1230,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         background: var(--beige);
         border: 1px solid var(--beige-deep);
         opacity: 0.7;
-        transition: opacity 120ms ease, background 120ms ease;
+        transition:
+            opacity 120ms ease,
+            background 120ms ease;
         &:hover {
             opacity: 1;
             background: var(--beige-deep);
@@ -1066,7 +1389,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-size: 0.88rem;
         color: var(--beige);
         background: var(--maroon-bright);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &:hover:not(:disabled) {
             transform: translateY(-1px);
         }
@@ -1131,7 +1456,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         color: var(--muted);
         border: 1px solid var(--beige-deep);
         background: var(--paper);
-        transition: background 120ms ease, color 120ms ease;
+        transition:
+            background 120ms ease,
+            color 120ms ease;
         &:hover:not(:disabled) {
             background: var(--beige-deep);
             color: var(--maroon-deep);
@@ -1170,7 +1497,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         color: var(--beige);
         background: var(--maroon);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &:hover:not(:disabled) {
             background: #7f2230;
             transform: translateY(-1px);

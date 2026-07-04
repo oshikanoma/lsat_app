@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright: Ankitects Pty Ltd and contributors
+# License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
+
 """Held-out eval for the LSAT Socratic Station grader.
 
 Every AI output (does this explanation deserve credit?) is checked against a

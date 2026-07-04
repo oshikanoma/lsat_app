@@ -17,14 +17,14 @@ Everything that matters lives inside the collection, which is created and manage
 by the shared Rust engine — the same crate that AnkiDroid and Anki-compatible iOS
 clients run on the device:
 
-| Thing | Where it lives | Shared? |
-| --- | --- | --- |
-| LSAT practice questions (LR/RC) | `LSAT MCQ` notetype cards in `LSAT Practice::*` decks | Yes — normal cards |
-| Word of the Day vocab | `LSAT Vocab` notetype cards | Yes — normal cards |
-| Spaced-repetition state | FSRS memory state on each card | Yes — engine-owned |
-| Practice attempts (Performance) | `lsat:attempts` collection config key | Yes — synced config |
-| Profile / plan / pet / coins | `lsat:profile`, `lsat:pet` config keys | Yes — synced config |
-| The 3 scores + give-up rule | `rslib/src/lsat.rs` → `LsatService.GetReadiness` | Yes — engine RPC |
+| Thing                           | Where it lives                                        | Shared?             |
+| ------------------------------- | ----------------------------------------------------- | ------------------- |
+| LSAT practice questions (LR/RC) | `LSAT MCQ` notetype cards in `LSAT Practice::*` decks | Yes — normal cards  |
+| Word of the Day vocab           | `LSAT Vocab` notetype cards                           | Yes — normal cards  |
+| Spaced-repetition state         | FSRS memory state on each card                        | Yes — engine-owned  |
+| Practice attempts (Performance) | `lsat:attempts` collection config key                 | Yes — synced config |
+| Profile / plan / pet / coins    | `lsat:profile`, `lsat:pet` config keys                | Yes — synced config |
+| The 3 scores + give-up rule     | `rslib/src/lsat.rs` → `LsatService.GetReadiness`      | Yes — engine RPC    |
 
 Because the three scores are computed in `rslib` and exposed through the backend
 service `BackendLsatService` (see `proto/anki/lsat.proto`), **any** client built
@@ -72,7 +72,7 @@ both ways. The interactive MCQ template renders and is tappable. What stock
 AnkiDroid does **not** show is our custom home screen (scores dashboard, pet,
 Socratic Station) — for that, use Path B.
 
-### Path B — full companion: AnkiDroid built on *this* engine
+### Path B — full companion: AnkiDroid built on _this_ engine
 
 This gives the phone the LSAT scores UI (and any other engine feature) by
 compiling AnkiDroid against this fork's `rslib`.

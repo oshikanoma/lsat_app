@@ -23,8 +23,7 @@ export async function postProto<T>(
         // "Failed to fetch") are not actionable by the user and pop up a jarring
         // native dialog in embedded WebViews — swallow the dialog but still
         // rethrow so callers can handle/retry. Real backend errors still alert.
-        const isNetworkError =
-            err instanceof TypeError
+        const isNetworkError = err instanceof TypeError
             || (err instanceof Error
                 && /failed to fetch|networkerror|load failed|network request failed/i.test(
                     err.message,

@@ -3,30 +3,30 @@
 **Exam: LSAT (120–180 scale).** Two Logical Reasoning sections + one Reading
 Comprehension section (logic games retired Aug 2024).
 
-The app answers three *different* questions and never blends them into one
+The app answers three _different_ questions and never blends them into one
 number. All three are computed inside Anki's Rust engine
 ([`rslib/src/lsat.rs`](rslib/src/lsat.rs)) and returned to both the desktop and
 mobile apps through the shared backend RPC `get_readiness` → `ReadinessResponse`
 (`proto/anki/lsat.proto`). Each score is an `LsatScore { available, estimate,
 low, high, confidence, sample_size, reasons }`.
 
-| Score | Question it answers | Data source | Scale |
-|-------|--------------------|-------------|-------|
-| Memory | Can the student recall a fact right now? | FSRS card states | probability 0–1 |
-| Performance | Can they answer a *new* exam-style question? | graded practice attempts | accuracy 0–1 |
-| Readiness | What LSAT score would they get today? | performance → projection | 120–180 |
+| Score       | Question it answers                          | Data source              | Scale           |
+| ----------- | -------------------------------------------- | ------------------------ | --------------- |
+| Memory      | Can the student recall a fact right now?     | FSRS card states         | probability 0–1 |
+| Performance | Can they answer a _new_ exam-style question? | graded practice attempts | accuracy 0–1    |
+| Readiness   | What LSAT score would they get today?        | performance → projection | 120–180         |
 
 Every score carries a **point estimate**, a **likely range** (`low`/`high`), a
 **confidence** indicator, a **sample size**, and human-readable **reasons**. If
 there is not enough data, `available = false` and `reasons` says exactly what is
-missing — the app shows *no number* rather than a guess (the "give-up rule").
+missing — the app shows _no number_ rather than a guess (the "give-up rule").
 
 ---
 
 ## 1. Memory — mean FSRS retrievability
 
 Memory is the average probability that the student can recall a reviewed card
-*right now*. We do not re-implement FSRS; we read its state.
+_right now_. We do not re-implement FSRS; we read its state.
 
 For every card that has an FSRS memory state, the engine computes current
 retrievability given time elapsed since the last review:
@@ -53,7 +53,7 @@ confidence = min(n / 100, 1)                          # grows with sample size
 
 ## 2. Performance — accuracy on graded questions with a binomial CI
 
-Performance is how often the student answers *new, exam-style* LR/RC questions
+Performance is how often the student answers _new, exam-style_ LR/RC questions
 correctly. Every graded attempt in the practice flow is logged to the
 collection config (`lsat:attempts`) as `{correct, section, question_type,
 passage}`. Over the `n` recorded attempts with `c` correct:
@@ -66,7 +66,7 @@ confidence = min(n / 100, 1)
 ```
 
 - **Why this is a separate score from Memory:** remembering a flashcard does not
-  mean you can answer a passage-based question that *uses* the fact. Performance
+  mean you can answer a passage-based question that _uses_ the fact. Performance
   is measured only from real graded question attempts, never from FSRS state.
 - **Give-up rule:** if `n < MIN_ATTEMPTS_FOR_PERFORMANCE` (**20**), performance
   is unavailable.
@@ -81,23 +81,23 @@ until the student has genuinely broad, deep evidence.
 
 Readiness stays unavailable — and lists each unmet condition — unless:
 
-| Gate | Constant | Threshold |
-|------|----------|-----------|
+| Gate                                | Constant                            | Threshold |
+| ----------------------------------- | ----------------------------------- | --------- |
 | Graded practice questions (LR + RC) | `MIN_GRADED_PRACTICE_FOR_READINESS` | ≥ **200** |
-| LR question-type taxonomy covered | `MIN_LR_COVERAGE_FOR_READINESS` | ≥ **50%** |
-| Distinct completed RC passages | `MIN_RC_PASSAGES_FOR_READINESS` | ≥ **3** |
-| A working performance model | `performance.available` | required |
+| LR question-type taxonomy covered   | `MIN_LR_COVERAGE_FOR_READINESS`     | ≥ **50%** |
+| Distinct completed RC passages      | `MIN_RC_PASSAGES_FOR_READINESS`     | ≥ **3**   |
+| A working performance model         | `performance.available`             | required  |
 
 Coverage is measured against the 14-type LR taxonomy (`LR_TAXONOMY`: Main Point,
 Necessary/Sufficient Assumption, Strengthen, Weaken, Flaw, Inference, Method of
 Reasoning, Parallel Reasoning, Parallel Flaw, Principle, Resolve/Explain, Point
-at Issue, Role in Argument), so readiness requires *breadth* across question
+at Issue, Role in Argument), so readiness requires _breadth_ across question
 types, not just volume.
 
 ### The projection (once unlocked)
 
 Accuracy is mapped linearly onto the LSAT scale, and the performance interval is
-carried through the *same* map so the range stays honest:
+carried through the _same_ map so the range stays honest:
 
 ```
 scale(a)  = 120 + clamp(a, 0, 1) · 60
@@ -125,8 +125,8 @@ score:
 
 **Calibration caveat (honest):** the projection is a deterministic, interval-
 preserving map from measured accuracy, and confidence/interval width represent
-its uncertainty. We do **not** yet claim a calibration curve of past *predicted
-vs. actual official LSAT scores*, because that requires real post-test outcome
+its uncertainty. We do **not** yet claim a calibration curve of past _predicted
+vs. actual official LSAT scores_, because that requires real post-test outcome
 data we do not have. This is stated rather than hidden.
 
 ---

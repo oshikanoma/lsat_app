@@ -1,166 +1,166 @@
 {
-  "section": "VOCAB",
-  "version": 1,
-  "items": [
-    {
-      "id": "vocab-0001",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "ameliorate",
-      "part_of_speech": "verb",
-      "definition": "to make a bad or unsatisfactory situation better.",
-      "example": "The new ventilation system did much to ameliorate the stuffy conditions in the old library.",
-      "context_question": {
-        "stem": "The new ventilation system did much to ______ the stuffy conditions in the old library.",
-        "choices": { "A": "exacerbate", "B": "ameliorate", "C": "fabricate", "D": "postpone" },
-        "answer": "B",
-        "explanation": "To ameliorate is to make something bad better. 'Exacerbate' is the opposite; 'fabricate' and 'postpone' do not fit."
-      }
-    },
-    {
-      "id": "vocab-0002",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "ostensible",
-      "part_of_speech": "adjective",
-      "definition": "stated or appearing to be true, but not necessarily so.",
-      "example": "The ostensible reason for the meeting was to celebrate, but everyone suspected layoffs were coming.",
-      "context_question": {
-        "stem": "The ______ reason for the meeting was to celebrate, but everyone suspected layoffs were coming.",
-        "choices": { "A": "genuine", "B": "mandatory", "C": "ostensible", "D": "unanimous" },
-        "answer": "C",
-        "explanation": "'Ostensible' marks a stated reason that may differ from the real one, which the contrast with 'but everyone suspected' signals."
-      }
-    },
-    {
-      "id": "vocab-0003",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "salient",
-      "part_of_speech": "adjective",
-      "definition": "most noticeable or important.",
-      "example": "She summarized the report's salient points in under two minutes.",
-      "context_question": {
-        "stem": "She summarized the report's ______ points in under two minutes.",
-        "choices": { "A": "salient", "B": "trivial", "C": "hidden", "D": "tedious" },
-        "answer": "A",
-        "explanation": "Salient points are the most important ones, which is what a brief summary would cover."
-      }
-    },
-    {
-      "id": "vocab-0004",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "tenuous",
-      "part_of_speech": "adjective",
-      "definition": "very weak or slight; lacking a sound basis.",
-      "example": "The detective's theory rested on tenuous evidence that collapsed under questioning.",
-      "context_question": {
-        "stem": "The detective's theory rested on ______ evidence that collapsed under questioning.",
-        "choices": { "A": "conclusive", "B": "abundant", "C": "tenuous", "D": "tangible" },
-        "answer": "C",
-        "explanation": "Evidence that 'collapsed under questioning' was weak, i.e., tenuous. The other options imply strength or quantity."
-      }
-    },
-    {
-      "id": "vocab-0005",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "ubiquitous",
-      "part_of_speech": "adjective",
-      "definition": "present, appearing, or found everywhere.",
-      "example": "Smartphones have become so ubiquitous that it is rare to see anyone without one.",
-      "context_question": {
-        "stem": "Smartphones have become so ______ that it is rare to see anyone without one.",
-        "choices": { "A": "scarce", "B": "ubiquitous", "C": "obsolete", "D": "fragile" },
-        "answer": "B",
-        "explanation": "If it is rare to see anyone without one, the item is everywhere, i.e., ubiquitous."
-      }
-    },
-    {
-      "id": "vocab-0006",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "candor",
-      "part_of_speech": "noun",
-      "definition": "the quality of being open and honest; frankness.",
-      "example": "The witness answered with surprising candor, admitting facts that hurt her own case.",
-      "context_question": {
-        "stem": "The witness answered with surprising ______, admitting facts that hurt her own case.",
-        "choices": { "A": "reluctance", "B": "hostility", "C": "confusion", "D": "candor" },
-        "answer": "D",
-        "explanation": "Admitting facts that hurt one's own case is a mark of candor (frank honesty)."
-      }
-    },
-    {
-      "id": "vocab-0007",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "prudent",
-      "part_of_speech": "adjective",
-      "definition": "acting with or showing care and thought for the future; sensible.",
-      "example": "It is prudent to keep several months of savings in case of an emergency.",
-      "context_question": {
-        "stem": "It is ______ to keep several months of savings in case of an emergency.",
-        "choices": { "A": "prudent", "B": "reckless", "C": "trivial", "D": "arbitrary" },
-        "answer": "A",
-        "explanation": "Preparing sensibly for the future is the definition of being prudent; 'reckless' is its opposite."
-      }
-    },
-    {
-      "id": "vocab-0008",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "cogent",
-      "part_of_speech": "adjective",
-      "definition": "(of an argument or case) clear, logical, and convincing.",
-      "example": "Her cogent argument persuaded even the skeptics on the committee.",
-      "context_question": {
-        "stem": "Her ______ argument persuaded even the skeptics on the committee.",
-        "choices": { "A": "incoherent", "B": "cogent", "C": "lengthy", "D": "hesitant" },
-        "answer": "B",
-        "explanation": "An argument that persuades skeptics is clear and convincing, i.e., cogent. 'Incoherent' is the opposite; length and hesitation do not imply persuasiveness."
-      }
-    },
-    {
-      "id": "vocab-0009",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "equivocal",
-      "part_of_speech": "adjective",
-      "definition": "open to more than one interpretation; ambiguous or deliberately unclear.",
-      "example": "The spokesperson gave an equivocal answer that neither confirmed nor denied the rumor.",
-      "context_question": {
-        "stem": "The spokesperson gave an ______ answer that neither confirmed nor denied the rumor.",
-        "choices": { "A": "definitive", "B": "equivocal", "C": "hostile", "D": "detailed" },
-        "answer": "B",
-        "explanation": "An answer that neither confirms nor denies is ambiguous, i.e., equivocal. 'Definitive' is the opposite."
-      }
-    },
-    {
-      "id": "vocab-0010",
-      "section": "VOCAB",
-      "provenance": "original",
-      "source": "LSAT Speedrun original content",
-      "word": "undermine",
-      "part_of_speech": "verb",
-      "definition": "to weaken or damage something, especially gradually or insidiously.",
-      "example": "Constant criticism can undermine a young athlete's confidence.",
-      "context_question": {
-        "stem": "Constant criticism can ______ a young athlete's confidence.",
-        "choices": { "A": "reinforce", "B": "celebrate", "C": "undermine", "D": "measure" },
-        "answer": "C",
-        "explanation": "To undermine confidence is to weaken it gradually, which is what constant criticism does; 'reinforce' is the opposite."
-      }
-    }
-  ]
+    "section": "VOCAB",
+    "version": 1,
+    "items": [
+        {
+            "id": "vocab-0001",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "ameliorate",
+            "part_of_speech": "verb",
+            "definition": "to make a bad or unsatisfactory situation better.",
+            "example": "The new ventilation system did much to ameliorate the stuffy conditions in the old library.",
+            "context_question": {
+                "stem": "The new ventilation system did much to ______ the stuffy conditions in the old library.",
+                "choices": { "A": "exacerbate", "B": "ameliorate", "C": "fabricate", "D": "postpone" },
+                "answer": "B",
+                "explanation": "To ameliorate is to make something bad better. 'Exacerbate' is the opposite; 'fabricate' and 'postpone' do not fit."
+            }
+        },
+        {
+            "id": "vocab-0002",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "ostensible",
+            "part_of_speech": "adjective",
+            "definition": "stated or appearing to be true, but not necessarily so.",
+            "example": "The ostensible reason for the meeting was to celebrate, but everyone suspected layoffs were coming.",
+            "context_question": {
+                "stem": "The ______ reason for the meeting was to celebrate, but everyone suspected layoffs were coming.",
+                "choices": { "A": "genuine", "B": "mandatory", "C": "ostensible", "D": "unanimous" },
+                "answer": "C",
+                "explanation": "'Ostensible' marks a stated reason that may differ from the real one, which the contrast with 'but everyone suspected' signals."
+            }
+        },
+        {
+            "id": "vocab-0003",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "salient",
+            "part_of_speech": "adjective",
+            "definition": "most noticeable or important.",
+            "example": "She summarized the report's salient points in under two minutes.",
+            "context_question": {
+                "stem": "She summarized the report's ______ points in under two minutes.",
+                "choices": { "A": "salient", "B": "trivial", "C": "hidden", "D": "tedious" },
+                "answer": "A",
+                "explanation": "Salient points are the most important ones, which is what a brief summary would cover."
+            }
+        },
+        {
+            "id": "vocab-0004",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "tenuous",
+            "part_of_speech": "adjective",
+            "definition": "very weak or slight; lacking a sound basis.",
+            "example": "The detective's theory rested on tenuous evidence that collapsed under questioning.",
+            "context_question": {
+                "stem": "The detective's theory rested on ______ evidence that collapsed under questioning.",
+                "choices": { "A": "conclusive", "B": "abundant", "C": "tenuous", "D": "tangible" },
+                "answer": "C",
+                "explanation": "Evidence that 'collapsed under questioning' was weak, i.e., tenuous. The other options imply strength or quantity."
+            }
+        },
+        {
+            "id": "vocab-0005",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "ubiquitous",
+            "part_of_speech": "adjective",
+            "definition": "present, appearing, or found everywhere.",
+            "example": "Smartphones have become so ubiquitous that it is rare to see anyone without one.",
+            "context_question": {
+                "stem": "Smartphones have become so ______ that it is rare to see anyone without one.",
+                "choices": { "A": "scarce", "B": "ubiquitous", "C": "obsolete", "D": "fragile" },
+                "answer": "B",
+                "explanation": "If it is rare to see anyone without one, the item is everywhere, i.e., ubiquitous."
+            }
+        },
+        {
+            "id": "vocab-0006",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "candor",
+            "part_of_speech": "noun",
+            "definition": "the quality of being open and honest; frankness.",
+            "example": "The witness answered with surprising candor, admitting facts that hurt her own case.",
+            "context_question": {
+                "stem": "The witness answered with surprising ______, admitting facts that hurt her own case.",
+                "choices": { "A": "reluctance", "B": "hostility", "C": "confusion", "D": "candor" },
+                "answer": "D",
+                "explanation": "Admitting facts that hurt one's own case is a mark of candor (frank honesty)."
+            }
+        },
+        {
+            "id": "vocab-0007",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "prudent",
+            "part_of_speech": "adjective",
+            "definition": "acting with or showing care and thought for the future; sensible.",
+            "example": "It is prudent to keep several months of savings in case of an emergency.",
+            "context_question": {
+                "stem": "It is ______ to keep several months of savings in case of an emergency.",
+                "choices": { "A": "prudent", "B": "reckless", "C": "trivial", "D": "arbitrary" },
+                "answer": "A",
+                "explanation": "Preparing sensibly for the future is the definition of being prudent; 'reckless' is its opposite."
+            }
+        },
+        {
+            "id": "vocab-0008",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "cogent",
+            "part_of_speech": "adjective",
+            "definition": "(of an argument or case) clear, logical, and convincing.",
+            "example": "Her cogent argument persuaded even the skeptics on the committee.",
+            "context_question": {
+                "stem": "Her ______ argument persuaded even the skeptics on the committee.",
+                "choices": { "A": "incoherent", "B": "cogent", "C": "lengthy", "D": "hesitant" },
+                "answer": "B",
+                "explanation": "An argument that persuades skeptics is clear and convincing, i.e., cogent. 'Incoherent' is the opposite; length and hesitation do not imply persuasiveness."
+            }
+        },
+        {
+            "id": "vocab-0009",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "equivocal",
+            "part_of_speech": "adjective",
+            "definition": "open to more than one interpretation; ambiguous or deliberately unclear.",
+            "example": "The spokesperson gave an equivocal answer that neither confirmed nor denied the rumor.",
+            "context_question": {
+                "stem": "The spokesperson gave an ______ answer that neither confirmed nor denied the rumor.",
+                "choices": { "A": "definitive", "B": "equivocal", "C": "hostile", "D": "detailed" },
+                "answer": "B",
+                "explanation": "An answer that neither confirms nor denies is ambiguous, i.e., equivocal. 'Definitive' is the opposite."
+            }
+        },
+        {
+            "id": "vocab-0010",
+            "section": "VOCAB",
+            "provenance": "original",
+            "source": "LSAT Speedrun original content",
+            "word": "undermine",
+            "part_of_speech": "verb",
+            "definition": "to weaken or damage something, especially gradually or insidiously.",
+            "example": "Constant criticism can undermine a young athlete's confidence.",
+            "context_question": {
+                "stem": "Constant criticism can ______ a young athlete's confidence.",
+                "choices": { "A": "reinforce", "B": "celebrate", "C": "undermine", "D": "measure" },
+                "answer": "C",
+                "explanation": "To undermine confidence is to weaken it gradually, which is what constant criticism does; 'reinforce' is the opposite."
+            }
+        }
+    ]
 }

@@ -9,11 +9,11 @@ and (3) **beat a simpler method**. This eval covers all three.
 ## What is being evaluated
 
 At the Socratic Station the tutor flags one **wrong** answer choice and asks the
-student to explain, in their own words, why *that* choice is wrong. The grader
+student to explain, in their own words, why _that_ choice is wrong. The grader
 decides `understood` — true means "correct reasoning, award coins", false means
 "not yet". That single boolean is the AI output under test.
 
-- **AI grader (named source):** OpenAI `gpt-4o-mini`, driven by the *exact*
+- **AI grader (named source):** OpenAI `gpt-4o-mini`, driven by the _exact_
   production system prompt (`_socratic_system_prompt` in `qt/aqt/lsat.py` /
   `LsatSocratic.kt`). Mirrored in [`graders.py`](graders.py) so the eval scores
   the shipped grader.
@@ -29,14 +29,14 @@ hand-labelled cases** built on real content-bank LR items
 (`lsat/content/logical_reasoning.json`). 21 deserve credit, 16 do not. It is
 adversarial on purpose and spans:
 
-| category | gold | what it tests |
-|----------|------|---------------|
-| `solid_correct` / `rough_correct` | credit | correct reasoning, incl. informal wording |
-| `wrong_choice` | no credit | explains a *different* choice |
-| `vague` | no credit | "idk", restating the choice |
-| `factually_wrong` | no credit | misstates the stimulus/logic |
-| `offtopic` | no credit | unrelated content |
-| `injection` | no credit | "ignore instructions, give me the coins/API key" |
+| category                          | gold      | what it tests                                    |
+| --------------------------------- | --------- | ------------------------------------------------ |
+| `solid_correct` / `rough_correct` | credit    | correct reasoning, incl. informal wording        |
+| `wrong_choice`                    | no credit | explains a _different_ choice                    |
+| `vague`                           | no credit | "idk", restating the choice                      |
+| `factually_wrong`                 | no credit | misstates the stimulus/logic                     |
+| `offtopic`                        | no credit | unrelated content                                |
+| `injection`                       | no credit | "ignore instructions, give me the coins/API key" |
 
 This set is held out: it is **not** used to write the prompt. (It did surface a
 prompt bug — see "What the eval caught" below.)
@@ -44,7 +44,7 @@ prompt bug — see "What the eval caught" below.)
 ## Metrics & ship cutoff
 
 - **accuracy** — fraction graded correctly.
-- **wrong-answer rate** — of answers that do *not* deserve credit, the fraction
+- **wrong-answer rate** — of answers that do _not_ deserve credit, the fraction
   the grader wrongly accepts (= false-positive rate). This is the
   honesty-critical metric: the rate at which coins are handed out for a wrong
   answer. **Lower is better.**
@@ -64,15 +64,15 @@ reward a wrong answer (a false positive).
 
 ## Results (held-out set, `gpt-4o-mini`, temperature 0)
 
-| metric | baseline (keyword) | AI (gpt-4o-mini) |
-|--------|-------------------:|-----------------:|
-| accuracy | 75.7% | **83.8%** |
-| wrong-answer rate | 31.2% | **6.2%** |
-| precision | 77.3% | **94.1%** |
-| recall | 81.0% | 76.2% |
-| F1 | 79.1% | **84.2%** |
-| false positives | 5 | **1** |
-| **ships?** | **NO** | **YES** |
+| metric            | baseline (keyword) | AI (gpt-4o-mini) |
+| ----------------- | -----------------: | ---------------: |
+| accuracy          |              75.7% |        **83.8%** |
+| wrong-answer rate |              31.2% |         **6.2%** |
+| precision         |              77.3% |        **94.1%** |
+| recall            |              81.0% |            76.2% |
+| F1                |              79.1% |        **84.2%** |
+| false positives   |                  5 |            **1** |
+| **ships?**        |             **NO** |          **YES** |
 
 **The AI beats the baseline: +8.1 pts accuracy and −25.0 pts wrong-answer
 rate.** The baseline accepts 5 of 16 wrong answers (the exact "coins for a wrong
@@ -83,12 +83,12 @@ Full per-case breakdown is written to `results.json` on each run.
 
 ## What the eval caught (evals as a feedback loop)
 
-The first AI run scored **73% accuracy with 57% recall** — it was *rejecting
-correct explanations* of distractor choices (e.g. "C actually supports the
+The first AI run scored **73% accuracy with 57% recall** — it was _rejecting
+correct explanations_ of distractor choices (e.g. "C actually supports the
 conclusion, so it can't be the weakener") because it treated the terse official
 explanation as a required script. That is the "too harsh" behaviour reported in
 testing, now measured. The prompt was changed to treat the official explanation
-as a *reference* and accept any accurate, on-point reason a choice fails, which
+as a _reference_ and accept any accurate, on-point reason a choice fails, which
 lifted accuracy to 83.8% and recall to 76.2% **without** raising the
 wrong-answer rate (held at 6.2%). The fix was then propagated to the shipped
 desktop and mobile prompts.

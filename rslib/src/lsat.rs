@@ -8,25 +8,24 @@
 //! - **Performance**: how accurately the learner answers graded LR/RC practice
 //!   questions, with a 95% confidence interval. Hidden until there are enough
 //!   graded questions to be meaningful.
-//! - **Readiness**: the performance -> projected-score bridge (120–180). Enforces
-//!   the give-up rule (PRD §8.2): shows NO score until ALL of the following hold
-//!   — at least [`MIN_GRADED_PRACTICE_FOR_READINESS`] graded practice questions,
-//!   at least [`MIN_LR_COVERAGE_FOR_READINESS`] of the LR question-type taxonomy
-//!   covered, at least [`MIN_RC_PASSAGES_FOR_READINESS`] completed RC passages,
-//!   and a working performance model. Until then it reports exactly what is
-//!   missing. Once unlocked it projects performance accuracy onto the 120–180
-//!   scale with a range.
+//! - **Readiness**: the performance -> projected-score bridge (120–180).
+//!   Enforces the give-up rule (PRD §8.2): shows NO score until ALL of the
+//!   following hold — at least [`MIN_GRADED_PRACTICE_FOR_READINESS`] graded
+//!   practice questions, at least [`MIN_LR_COVERAGE_FOR_READINESS`] of the LR
+//!   question-type taxonomy covered, at least [`MIN_RC_PASSAGES_FOR_READINESS`]
+//!   completed RC passages, and a working performance model. Until then it
+//!   reports exactly what is missing. Once unlocked it projects performance
+//!   accuracy onto the 120–180 scale with a range.
 //!
-//! Exposed to every client (desktop + mobile) through the shared backend, so the
-//! same engine drives both apps.
-
-use fsrs::FSRS;
-use fsrs::FSRS5_DEFAULT_DECAY;
-use serde::Deserialize;
+//! Exposed to every client (desktop + mobile) through the shared backend, so
+//! the same engine drives both apps.
 
 use anki_proto::lsat::GetReadinessRequest;
 use anki_proto::lsat::LsatScore;
 use anki_proto::lsat::ReadinessResponse;
+use fsrs::FSRS;
+use fsrs::FSRS5_DEFAULT_DECAY;
+use serde::Deserialize;
 
 use crate::collection::Collection;
 use crate::prelude::*;
@@ -45,8 +44,8 @@ pub(crate) const MIN_MEMORY_CARDS: usize = 10;
 /// performance score. Below this we refuse to guess.
 pub(crate) const MIN_ATTEMPTS_FOR_PERFORMANCE: usize = 20;
 
-/// Give-up rule (PRD §8.2), part 1: minimum graded practice questions across the
-/// two scored sections before a readiness score can be shown.
+/// Give-up rule (PRD §8.2), part 1: minimum graded practice questions across
+/// the two scored sections before a readiness score can be shown.
 pub(crate) const MIN_GRADED_PRACTICE_FOR_READINESS: usize = 200;
 
 /// Give-up rule (PRD §8.2), part 2: minimum fraction of the LR question-type
@@ -60,8 +59,8 @@ pub(crate) const MIN_RC_PASSAGES_FOR_READINESS: usize = 3;
 /// The exam's Logical Reasoning question-type taxonomy. Readiness coverage is
 /// measured as the fraction of these types the learner has actually attempted.
 /// Compared case-insensitively against each attempt's `question_type`, so the
-/// content bank's labels ("Weaken", "Necessary Assumption", "Resolve/Explain", …)
-/// map straight onto it.
+/// content bank's labels ("Weaken", "Necessary Assumption", "Resolve/Explain",
+/// …) map straight onto it.
 pub(crate) const LR_TAXONOMY: [&str; 14] = [
     "main point",
     "necessary assumption",
@@ -473,8 +472,9 @@ mod test {
         assert_eq!(score.sample_size, 40);
     }
 
-    /// Build a batch of graded attempts: `n` questions, `correct` of them right,
-    /// spread across `lr_types` distinct LR types and `rc_passages` RC passages.
+    /// Build a batch of graded attempts: `n` questions, `correct` of them
+    /// right, spread across `lr_types` distinct LR types and `rc_passages`
+    /// RC passages.
     fn attempts(n: usize, correct: usize, lr_types: usize, rc_passages: usize) -> Vec<Attempt> {
         let mut out = Vec::new();
         for i in 0..n {
@@ -524,7 +524,7 @@ mod test {
             1,
             0,
         ));
-        let perf = performance_score(&vec![true; MIN_GRADED_PRACTICE_FOR_READINESS]);
+        let perf = performance_score(&[true; MIN_GRADED_PRACTICE_FOR_READINESS]);
         assert!(perf.available);
         let score = readiness_score(&cov, &perf);
         assert!(!score.available);

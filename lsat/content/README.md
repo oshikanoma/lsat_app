@@ -9,12 +9,12 @@ See PRD §14 for the full sourcing decision. **Do not add scraped or copyrighted
 
 ## Files
 
-| File | Section | Contents |
-|---|---|---|
-| `schema.json` | — | JSON Schema (draft 2020-12) defining the record format. Source of truth. |
-| `logical_reasoning.json` | LR | Original Logical Reasoning questions across question types. |
-| `reading_comprehension.json` | RC | Original RC passage(s) with attached questions. |
-| `vocabulary.json` | VOCAB | Original "Word of the Day" entries with usage questions. |
+| File                         | Section | Contents                                                                 |
+| ---------------------------- | ------- | ------------------------------------------------------------------------ |
+| `schema.json`                | —       | JSON Schema (draft 2020-12) defining the record format. Source of truth. |
+| `logical_reasoning.json`     | LR      | Original Logical Reasoning questions across question types.              |
+| `reading_comprehension.json` | RC      | Original RC passage(s) with attached questions.                          |
+| `vocabulary.json`            | VOCAB   | Original "Word of the Day" entries with usage questions.                 |
 
 ## Provenance (required on every record)
 

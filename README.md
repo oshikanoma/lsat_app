@@ -23,7 +23,7 @@ to begin. From there you get:
     retrievability.
   - **Performance** — accuracy on interactive practice questions.
   - **Readiness** — overall progress toward test day.
-  Tap any metric to see *why* you got that score and how confident it is.
+    Tap any metric to see _why_ you got that score and how confident it is.
 - **Adaptive timed lessons.** One **Start lesson** button runs a 2-hour adaptive
   session (shown as a draining hourglass) that targets your weakest area. Answer
   choices are clickable with instant correct/incorrect feedback and an
@@ -32,7 +32,7 @@ to begin. From there you get:
   flashcard to a dedicated `LSAT Vocab` deck, with an interactive "use it in a
   sentence" check and arrows to browse words you've learned.
 - **Socratic Station.** A no-timer station that shows a wrong answer to an LSAT
-  question and asks you to explain *why* it's wrong; correct explanations earn
+  question and asks you to explain _why_ it's wrong; correct explanations earn
   coins. It runs an **AI tutor** (OpenAI `gpt-4o-mini`) that asks follow-ups and
   tailors feedback when a key is connected, and falls back to an offline
   keyword grader otherwise. A badge in the station header shows which engine is
@@ -67,19 +67,19 @@ reviews merge through Anki's normal sync without being lost or double-counted. S
 ### Readiness coverage rules (the give-up rule)
 
 The Readiness score is deliberately hard to show: the engine refuses to project a
-number until it has enough *and* broad enough evidence. All of these must hold
+number until it has enough _and_ broad enough evidence. All of these must hold
 (implemented in `rslib/src/lsat.rs`, matching [`prd.md`](./prd.md) §8.2):
 
-| Rule | Threshold | Constant |
-| --- | --- | --- |
-| Graded practice questions (LR + RC) | ≥ 200 | `MIN_GRADED_PRACTICE_FOR_READINESS` |
-| LR question-type taxonomy covered | ≥ 50% | `MIN_LR_COVERAGE_FOR_READINESS` |
-| Distinct completed RC passages | ≥ 3 | `MIN_RC_PASSAGES_FOR_READINESS` |
-| A working Performance model | required | (≥ 20 graded questions) |
+| Rule                                | Threshold | Constant                            |
+| ----------------------------------- | --------- | ----------------------------------- |
+| Graded practice questions (LR + RC) | ≥ 200     | `MIN_GRADED_PRACTICE_FOR_READINESS` |
+| LR question-type taxonomy covered   | ≥ 50%     | `MIN_LR_COVERAGE_FOR_READINESS`     |
+| Distinct completed RC passages      | ≥ 3       | `MIN_RC_PASSAGES_FOR_READINESS`     |
+| A working Performance model         | required  | (≥ 20 graded questions)             |
 
 Until every rule is met, the home screen shows **exactly what's missing and how
-to unlock it** (e.g. *"LR taxonomy coverage is 30% — reach 50% by practicing more
-question types"*) plus a live **"% of exam covered"** readout, instead of a made-up
+to unlock it** (e.g. _"LR taxonomy coverage is 30% — reach 50% by practicing more
+question types"_) plus a live **"% of exam covered"** readout, instead of a made-up
 score. Once unlocked, Readiness projects the measured graded accuracy onto the real
 **120–180** LSAT scale, carrying the confidence interval through so the range stays
 honest. Each answer records the metadata the rule needs — section, LR
@@ -112,10 +112,10 @@ each graded answer already stores its `question_type` in the synced
 - **Dashboard breakdown.** The home screen shows a "Logical Reasoning by question
   type" list, weakest first. It follows the same honesty rule as the main scores —
   a type's accuracy is hidden until it has at least `MIN_TYPE_ATTEMPTS` (5) graded
-  answers, showing *"N more to score"* instead of a shaky percentage.
+  answers, showing _"N more to score"_ instead of a shaky percentage.
 - **Adaptive selection.** Timed lessons prefetch several due LR cards and serve the
   one whose type most needs work (untested types first, then lowest accuracy),
-  mirroring the existing weakest-*section*-first logic at question-type
+  mirroring the existing weakest-_section_-first logic at question-type
   granularity. This is a deterministic heuristic computed in
   `_weakest_type_index` (desktop) / `weakestTypeIndex` (phone) — no network or API
   key required, and it reads the same synced attempt log on both platforms.
@@ -205,7 +205,7 @@ shasum -a 256 homebase-26.05-android-arm64.apk  # Android installer
    engine `homebase.` runs on — but it opens straight to the LSAT home screen.)
 3. **First launch only:** because this build isn't signed with a paid Apple
    Developer certificate, macOS will refuse to open it the first time with a
-   message like *"Apple could not verify … is free of malware."* This is
+   message like _"Apple could not verify … is free of malware."_ This is
    expected. To get past it once:
    - Open **System Settings → Privacy & Security**, scroll to the bottom, and
      click **Open Anyway** next to the Anki message, then confirm with **Open**.
@@ -215,7 +215,7 @@ shasum -a 256 homebase-26.05-android-arm64.apk  # Android installer
    After that first time it launches normally with a double-click, forever.
 
 > Why the warning? Signing an app so it opens with zero friction requires an
-> Apple Developer ID ($99/year) and notarization. This build is *ad-hoc signed*
+> Apple Developer ID ($99/year) and notarization. This build is _ad-hoc signed_
 > instead, which is free but triggers the one-time prompt above. The app itself
 > is unchanged.
 
@@ -223,8 +223,8 @@ shasum -a 256 homebase-26.05-android-arm64.apk  # Android installer
 
 1. On the [latest release](https://github.com/oshikanoma/lsat_app/releases/latest),
    download the file ending in **`.apk`** onto your Android phone.
-2. Tap the downloaded file. Android will ask permission to *"install unknown
-   apps"* from your browser or Files app — allow it (this is the normal prompt
+2. Tap the downloaded file. Android will ask permission to _"install unknown
+   apps"_ from your browser or Files app — allow it (this is the normal prompt
    for any app installed outside the Play Store), then tap **Install**.
 3. Open the app; it launches to the same `homebase.` home screen and syncs with
    desktop via your AnkiWeb login.

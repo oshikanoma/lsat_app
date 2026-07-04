@@ -2,28 +2,30 @@
 
 > A desktop + mobile LSAT preparation app built **inside** the Anki codebase (a real change to Anki's Rust engine, not a layer on top).
 
-| | |
-|---|---|
-| **Product name** | LSAT Speedrun (working title) |
-| **Exam** | **LSAT** — scored **120–180** |
-| **Owner** | Tiffany Lam (tiffany.lam@alphaaiengineering.com) |
-| **Status** | Draft v1 |
-| **Codebase** | Fork of [Anki](https://github.com/ankitects/anki) (AGPL-3.0-or-later; some parts BSD-3-Clause) |
-| **Repo** | `oshikanoma/lsat_app` (remote `lsat`), upstream `ankitects/anki` |
+|                  |                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| **Product name** | LSAT Speedrun (working title)                                                                  |
+| **Exam**         | **LSAT** — scored **120–180**                                                                  |
+| **Owner**        | Tiffany Lam (tiffany.lam@alphaaiengineering.com)                                               |
+| **Status**       | Draft v1                                                                                       |
+| **Codebase**     | Fork of [Anki](https://github.com/ankitects/anki) (AGPL-3.0-or-later; some parts BSD-3-Clause) |
+| **Repo**         | `oshikanoma/lsat_app` (remote `lsat`), upstream `ankitects/anki`                               |
 
 ---
 
 ## 1. Vision
 
-Most LSAT prep rewards **volume without structure, intensity without consistency, and pattern recognition without genuine reasoning**. We are building the opposite: an app that enforces the *conditions under which LSAT skill actually develops* — distributed daily practice, real reasoning over memorization, and honest measurement of where the student actually stands.
+Most LSAT prep rewards **volume without structure, intensity without consistency, and pattern recognition without genuine reasoning**. We are building the opposite: an app that enforces the _conditions under which LSAT skill actually develops_ — distributed daily practice, real reasoning over memorization, and honest measurement of where the student actually stands.
 
 We are **not building another flashcard app**. Flashcards solve memory. The LSAT is a reasoning exam with almost no facts to memorize, so we build the two harder bridges the assignment demands:
 
-1. **Memory → Performance** — can the student answer a *new* exam-style question that uses a concept?
+1. **Memory → Performance** — can the student answer a _new_ exam-style question that uses a concept?
 2. **Performance → Readiness** — what LSAT score would they get today, and how sure are we?
 
 ### The honesty rule (non-negotiable)
+
 The app may **never** display a readiness score unless it can simultaneously show:
+
 - what evidence produced the number,
 - what data is still missing,
 - how accurate our past predictions turned out to be,
@@ -37,6 +39,7 @@ The app may **never** display a readiness score unless it can simultaneously sho
 ## 2. Problem statement
 
 The LSAT prep market is broken in a diagnosable way:
+
 - **Cramming is sold as a strategy** even though it is counterproductive for abstract reasoning (the Forgetting Curve; Cognitive Load Theory).
 - **Volume is undersupplied** — the community benchmark for stable mastery is ~2,500 questions, but the average self-studier attempts only 500-1,000 before their first test.
 - **Stamina is assumed, not trained** — the LSAT is ~2.5–3 hours of unrelenting reasoning; most students have never trained for that.
@@ -48,6 +51,7 @@ The LSAT prep market is broken in a diagnosable way:
 ## 3. Goals & non-goals
 
 ### Goals
+
 - Ship a **desktop app** (primary) and a **phone companion** that **share one engine** and **sync** reviews/progress both ways, offline-tolerant.
 - Make a **real change inside Anki's Rust code** (`rslib`), surfaced through the protobuf API to both clients.
 - Show **three separate scores** — Memory, Performance, Readiness — each with a **range**, never blended into one number.
@@ -56,6 +60,7 @@ The LSAT prep market is broken in a diagnosable way:
 - Be **honest**: refuse to score without enough data; show evidence behind every number.
 
 ### Non-goals (MVP)
+
 - Public app-store release (graders run via **emulator + local sync** for now).
 - Logic Games content (removed from the LSAT as of August 2024 — do **not** build around it).
 - Generic test-prep content not specific to the LSAT.
@@ -67,19 +72,22 @@ The LSAT prep market is broken in a diagnosable way:
 ## 4. Target user
 
 **Persona:** "The Pre-Law Undergrad"
+
 - Age **20–24**; college junior/senior, or on a gap year.
 - Applying to law school; the LSAT is the gatekeeper to admission (and scholarship money).
 - Studies in **two places**: at a desk (deep sessions) and on a **phone between classes** (light review).
 - Motivated but at risk of cramming and burnout; needs structure and an honest read on readiness.
 
 ### Primary user story
+
 > As an undergraduate applying to law school, I want to prepare for the LSAT in an engaging, structured way — and get an honest read on my projected score — so that I can improve efficiently and get accepted into law school.
 
 ### Supporting user stories
-- *As a busy student*, I want short daily sessions that fit around classes, so I build skill without burning out.
-- *As a commuter*, I want to review on my phone and have it show up on my desktop, so my progress is one continuous record.
-- *As an anxious test-taker*, I want to know my projected score **and how confident the app is**, so I can trust it and know what to fix next.
-- *As a careful learner*, I want untimed practice first and Blind Review, so I build accuracy before speed.
+
+- _As a busy student_, I want short daily sessions that fit around classes, so I build skill without burning out.
+- _As a commuter_, I want to review on my phone and have it show up on my desktop, so my progress is one continuous record.
+- _As an anxious test-taker_, I want to know my projected score **and how confident the app is**, so I can trust it and know what to fix next.
+- _As a careful learner_, I want untimed practice first and Blind Review, so I build accuracy before speed.
 
 ---
 
@@ -87,17 +95,17 @@ The LSAT prep market is broken in a diagnosable way:
 
 These are load-bearing product decisions, each grounded in a source (see Appendix).
 
-| Principle | What it means for the product | Source |
-|---|---|---|
-| **Distributed > massed practice** | Default plan is **1–3 hr/day over 6–12 months**, not cram blocks. | Cepeda et al. 2006; Ebbinghaus 1885 |
-| **2,500-question threshold** | Progress UI is framed against the ~2,500 graded-question mastery benchmark. | r/LSAT, 7Sage |
-| **Reasoning over recognition** | Lessons build the underlying reasoning muscle, not just question-type labels. | Nathan Fox; Mike Kim |
-| **LR is taxonomy-driven** | LR module uses question-type taxonomy (Weaken, Assumption, Flaw, etc.) with prephrasing. | Killoran / PowerScore LR Bible |
-| **RC is fluency-driven** | RC module emphasizes active reading (main idea, tone, viewpoints), **not** a taxonomy. | 7Sage, LSAT Demon |
-| **Official questions matter** | Use official LSAC-style PrepTest material as the gold standard; flag any third-party content as a risk. | Ben Olson / Velocity |
-| **Blind Review** | After a timed set, re-do questions untimed before seeing answers; separate knowledge gaps from execution gaps. | J.Y. Ping / 7Sage |
-| **Stamina is trained** | Session length and pacing progressively build toward 3-hour endurance. | Baumeister; Sweller |
-| **Accuracy before speed** | Untimed practice precedes timed; speed is introduced only once accuracy stabilizes. | Community consensus |
+| Principle                         | What it means for the product                                                                                  | Source                              |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Distributed > massed practice** | Default plan is **1–3 hr/day over 6–12 months**, not cram blocks.                                              | Cepeda et al. 2006; Ebbinghaus 1885 |
+| **2,500-question threshold**      | Progress UI is framed against the ~2,500 graded-question mastery benchmark.                                    | r/LSAT, 7Sage                       |
+| **Reasoning over recognition**    | Lessons build the underlying reasoning muscle, not just question-type labels.                                  | Nathan Fox; Mike Kim                |
+| **LR is taxonomy-driven**         | LR module uses question-type taxonomy (Weaken, Assumption, Flaw, etc.) with prephrasing.                       | Killoran / PowerScore LR Bible      |
+| **RC is fluency-driven**          | RC module emphasizes active reading (main idea, tone, viewpoints), **not** a taxonomy.                         | 7Sage, LSAT Demon                   |
+| **Official questions matter**     | Use official LSAC-style PrepTest material as the gold standard; flag any third-party content as a risk.        | Ben Olson / Velocity                |
+| **Blind Review**                  | After a timed set, re-do questions untimed before seeing answers; separate knowledge gaps from execution gaps. | J.Y. Ping / 7Sage                   |
+| **Stamina is trained**            | Session length and pacing progressively build toward 3-hour endurance.                                         | Baumeister; Sweller                 |
+| **Accuracy before speed**         | Untimed practice precedes timed; speed is introduced only once accuracy stabilizes.                            | Community consensus                 |
 
 ---
 
@@ -117,37 +125,44 @@ These are load-bearing product decisions, each grounded in a source (see Appendi
 ## 7. MVP scope
 
 ### 7.1 Home screen layout
+
 1. **Word of the Day** card pinned at the **top** (vocabulary flashcard — see 7.4).
 2. **One large primary button → "Today's Lesson"** — the adaptive guided session (the heart of the app).
 3. **Three section buttons** — Logical Reasoning · Reading Comprehension · Argumentative Writing — for self-directed practice.
 4. **The three scores** (Memory / Performance / Readiness) with ranges and an "honesty panel."
 5. **Daily progress + streak**, framed against the distributed-practice plan.
 
-> Students *may* freely choose a section, but the **diagnostics surface what they need most** and steer them toward it.
+> Students _may_ freely choose a section, but the **diagnostics surface what they need most** and steer them toward it.
 
 ### 7.2 Adaptive guided lessons (primary loop)
+
 - The app continuously assembles **curated lessons** based on the student's correct/incorrect history.
 - Targets the **weakest, highest-leverage** area next (e.g., a specific LR question type, or an RC skill).
 - **Untimed first**, then introduces time pressure once accuracy stabilizes.
 - Integrates **Blind Review**: timed attempt → untimed re-attempt → reveal + categorize the miss (knowledge gap vs execution gap).
 
 ### 7.3 Section modules
+
 - **Logical Reasoning** — taxonomy-driven: break stimulus into premises/conclusion, identify question type, prephrase before reading answers. Question types: Must Be True, Main Point, Weaken, Strengthen, Assumption (Necessary/Sufficient), Justify, Flaw, Inference, Resolve/Explain, Parallel, Principle, etc.
 - **Reading Comprehension** — fluency-driven: active reading of dense passages (humanities, social science, natural science, law); identify main idea, author tone, contrasting viewpoints.
 - **Argumentative Writing** — structured prompt practice with feedback (unscored toward readiness).
 
 ### 7.4 Word of the Day (the flashcard component, used honestly)
+
 Flashcards are **not** the core score model (the LSAT has almost no facts). They serve the one genuinely memory-based need — **vocabulary** — and provide a daily engagement hook, powered by Anki's existing **FSRS**.
+
 - Each day adds a new card: a **statistically "hard" LSAT word**, its **definition**, and a **usage/context question**.
 - Over time this becomes a **full spaced-repetition deck** of high-frequency hard words.
 - The app also **re-asks prior words** (~3 questions/day) via FSRS scheduling. (Days 1–3 have too few words to do this — handled gracefully.)
 
 ### 7.5 Session time management (flow-aware cap)
+
 - Default guidance: **~2 hours/day**, grounded in the 1–3 hr cognitive-quality window.
 - **Soft, not hard:** if a student is mid-lesson / in flow, the app lets them **finish the current lesson** rather than cutting them off — lessons complete **around** the cap, not exactly at it.
 - Gentle nudge to stop once past the window; emphasizes consistency over intensity.
 
 ### 7.6 Accounts, login & sync
+
 - **Login page** so a student signs in and **syncs progress across desktop and mobile**.
 - MVP runs via **emulator + local sync** (no public release yet); UI/UX adapts per screen (desktop vs phone).
 - Reviews/progress must flow **both ways** without loss or double-counting; **offline then sync on reconnect**.
@@ -158,16 +173,18 @@ Flashcards are **not** the core score model (the LSAT has almost no facts). They
 
 Each score is computed in the **Rust engine** and exposed via the protobuf API to **both** apps.
 
-| Score | Question it answers | Basis |
-|---|---|---|
-| **Memory** | Can the student recall a fact/word taught right now? | Anki **FSRS** (retrievability) — already strong; we reuse it. |
-| **Performance** | Can the student get a **new, unseen** exam-style question right? | **NEW** model over graded question history, per question type / skill. |
-| **Readiness** | What **LSAT score (120–180)** would they get today, with what confidence? | **NEW** model mapping performance + coverage → scaled score + range. |
+| Score           | Question it answers                                                       | Basis                                                                  |
+| --------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Memory**      | Can the student recall a fact/word taught right now?                      | Anki **FSRS** (retrievability) — already strong; we reuse it.          |
+| **Performance** | Can the student get a **new, unseen** exam-style question right?          | **NEW** model over graded question history, per question type / skill. |
+| **Readiness**   | What **LSAT score (120–180)** would they get today, with what confidence? | **NEW** model mapping performance + coverage → scaled score + range.   |
 
 ### 8.1 Required readiness display fields
+
 Every readiness display must include: **point estimate**, **likely range**, **% of exam covered so far**, a **confidence indicator**, **last-updated time**, **main reasons** behind the number, and the **give-up rule**.
 
 Example (target presentation):
+
 ```
 Projected LSAT: 162
 Likely range: 157–166
@@ -177,6 +194,7 @@ Last updated: today, 4:12 PM
 ```
 
 ### 8.2 The give-up rule (written down)
+
 > **The app shows NO readiness score until the student has at least 200 graded practice questions across the two scored sections AND ≥ 50% coverage of the LR question-type taxonomy AND ≥ 3 completed timed RC passages.**
 
 Until then, the readiness panel shows **what's missing and how to unlock it** instead of a number. A system that knows when it doesn't know.
@@ -187,12 +205,12 @@ Until then, the readiness panel shows **what's missing and how to unlock it** in
 
 Every AI output must (1) come from a **named source**, (2) be **checked against a held-out test set**, and (3) **beat a simpler baseline**. No AI ships before the Wednesday milestone.
 
-| AI feature | Named source / inputs | Baseline it must beat | Eval |
-|---|---|---|---|
-| **Performance model** | Student's graded review history (revlog) + question-type metadata | Raw % correct per type | Accuracy / calibration on held-out questions |
-| **Readiness model** | Performance + coverage features | Linear map from overall accuracy → 120–180 | Predicted vs actual on held-out practice tests; calibration of the range |
-| **Adaptive lesson selection** | Official LSAC-style question bank + diagnostic history | Random / fixed-order selection | Improvement in next-session accuracy on targeted skill |
-| **Word-of-the-Day selection** | Corpus of statistically frequent hard LSAT words | Random word pick | Coverage of high-frequency words |
+| AI feature                    | Named source / inputs                                             | Baseline it must beat                      | Eval                                                                     |
+| ----------------------------- | ----------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
+| **Performance model**         | Student's graded review history (revlog) + question-type metadata | Raw % correct per type                     | Accuracy / calibration on held-out questions                             |
+| **Readiness model**           | Performance + coverage features                                   | Linear map from overall accuracy → 120–180 | Predicted vs actual on held-out practice tests; calibration of the range |
+| **Adaptive lesson selection** | Official LSAC-style question bank + diagnostic history            | Random / fixed-order selection             | Improvement in next-session accuracy on targeted skill                   |
+| **Word-of-the-Day selection** | Corpus of statistically frequent hard LSAT words                  | Random word pick                           | Coverage of high-frequency words                                         |
 
 **Reproducibility:** all models are tested on **held-back data** using a **fixed, scripted train/test split** that someone else can re-run and get the same result.
 
@@ -203,6 +221,7 @@ Every AI output must (1) come from a **named source**, (2) be **checked against 
 ## 10. Architecture
 
 ### 10.1 Layered stack (where our changes live)
+
 Anki is five layers. The rules require our logic to live in the **bottom (Rust) layer**, surfaced upward.
 
 ```mermaid
@@ -294,17 +313,17 @@ flowchart TD
 
 ## 12. Compliance matrix — "the rules you cannot break"
 
-| Rule | How we satisfy it | Location |
-|---|---|---|
-| Real change in Anki's **Rust** code | New performance/readiness/question-bank modules | `rslib/src/...` |
-| Two apps, one engine, syncing | Desktop (Qt) + mobile (AnkiDroid/iOS FFI) sharing `rslib`; two-way sync | `rslib/src/sync`, clients |
-| Three scores, each with a **range** | Separate Memory/Performance/Readiness outputs with intervals | proto + `rslib` |
-| Test on held-back data, reproducibly | Scripted fixed train/test split + eval harness | repo `tools/` or `eval/` |
-| A/B one feature (on/off) | Feature flag + hypothesis + measurement (see §13) | engine flag + config |
-| AI: named source, test set, beats baseline | See §9 | models + eval |
-| **Refuse to score** without data | Give-up rule (§8.2) enforced in engine | `rslib` readiness module |
-| Ship installers, run with AI **off** | `tools/build-installer` (.dmg) + AI-off mode | build + config |
-| License/attribution | AGPL-3.0-or-later, credit Anki; keep headers | `LICENSE`, `README` |
+| Rule                                       | How we satisfy it                                                       | Location                  |
+| ------------------------------------------ | ----------------------------------------------------------------------- | ------------------------- |
+| Real change in Anki's **Rust** code        | New performance/readiness/question-bank modules                         | `rslib/src/...`           |
+| Two apps, one engine, syncing              | Desktop (Qt) + mobile (AnkiDroid/iOS FFI) sharing `rslib`; two-way sync | `rslib/src/sync`, clients |
+| Three scores, each with a **range**        | Separate Memory/Performance/Readiness outputs with intervals            | proto + `rslib`           |
+| Test on held-back data, reproducibly       | Scripted fixed train/test split + eval harness                          | repo `tools/` or `eval/`  |
+| A/B one feature (on/off)                   | Feature flag + hypothesis + measurement (see §13)                       | engine flag + config      |
+| AI: named source, test set, beats baseline | See §9                                                                  | models + eval             |
+| **Refuse to score** without data           | Give-up rule (§8.2) enforced in engine                                  | `rslib` readiness module  |
+| Ship installers, run with AI **off**       | `tools/build-installer` (.dmg) + AI-off mode                            | build + config            |
+| License/attribution                        | AGPL-3.0-or-later, credit Anki; keep headers                            | `LICENSE`, `README`       |
 
 ---
 
@@ -340,7 +359,9 @@ flowchart TD
 ## 15. Milestones (build in order: make it work → add AI → prove it)
 
 ### Wednesday — core works on both screens, **no AI**
+
 **Desktop**
+
 - Anki forked and building from source. ✅ (done — building & running)
 - Our **Rust change** working end-to-end: the diff + **3 Rust unit tests** + **1 test that calls it from Python**.
 - A **review loop** running on the LSAT deck.
@@ -348,22 +369,26 @@ flowchart TD
 - An **installer** that runs on a clean machine.
 
 **Mobile**
+
 - A phone app that **builds and runs** on a real device or emulator.
 - Loads the LSAT deck and runs a **real review session on the shared engine** (two-way sync not required yet).
 
 **Proof:** commit hash + clean-build recording, test results, clean-machine install recording, phone review-session recording.
 
 ### Friday — AI added & checked; phone syncs and shows readiness
+
 - Performance + Readiness models live, each from a **named source**, **beating a baseline**, validated on **held-out** data.
 - **Two-way sync** working; phone shows the **three scores with ranges** and follows the give-up rule.
 
 ### Sunday — prove it & ship
+
 - Reproducible eval anyone can re-run.
 - **Installable builds for both** desktop and phone, each running with **AI off**.
 
 ---
 
 ## 16. Success metrics
+
 - **Engine:** three scores returned with calibrated ranges; give-up rule verifiably blocks low-data scores.
 - **Model quality:** readiness predictions beat baseline on held-out data; ranges are well-calibrated (actual scores fall in the stated range at the stated rate).
 - **Cross-device:** a review on phone appears on desktop (and vice versa) with no double-counting, including after offline.
@@ -372,7 +397,8 @@ flowchart TD
 ---
 
 ## 17. Risks & open questions
-- **Question licensing** (official LSAC content) — see §14. *Decision needed.*
+
+- **Question licensing** (official LSAC content) — see §14. _Decision needed._
 - **Cold-start data sparsity** — readiness is hidden early by design; ensure the "what's missing" UX is motivating, not discouraging.
 - **RC is hard to "app-ify"** (fluency, not taxonomy) — risk that drilling underperforms; mitigate with active-reading exercises, not question-type labels.
 - **iOS FFI complexity** — running `rslib` through the C interface is non-trivial; AnkiDroid path is lower-risk for the mobile MVP.
@@ -382,6 +408,7 @@ flowchart TD
 ---
 
 ## 18. Out of scope (MVP)
+
 - Public app-store distribution.
 - Logic Games content/strategy (removed from the LSAT Aug 2024).
 - Non-LSAT test-prep methodologies (SAT/ACT/GRE).
@@ -391,20 +418,23 @@ flowchart TD
 ---
 
 ## Appendix A — Experts
+
 - **Nathan Fox** — Fox LSAT / LSAT Demon; explanation-first, anti-rote-drilling. <https://lsatdemon.com>
 - **David M. Killoran** — PowerScore; LR Bible (taxonomy gold standard). <https://powerscore.com>
-- **Mike Kim** — *The LSAT Trainer*; unified reasoning skill over rigid taxonomy. <https://thelsattrainer.com>
+- **Mike Kim** — _The LSAT Trainer_; unified reasoning skill over rigid taxonomy. <https://thelsattrainer.com>
 - **J.Y. Ping** — 7Sage; formalized **Blind Review**. <https://7sage.com>
 - **Ben Olson** — Velocity LSAT; official LSAC questions are non-negotiable. <https://youtube.com/velocitylsat>
 
 ## Appendix B — Key references
-- Ebbinghaus, H. (1885). *Über das Gedächtnis* — the Forgetting Curve.
-- Cepeda, N.J. et al. (2006). *Distributed Practice in Verbal Recall Tasks*. *Psychological Bulletin*, 132(3), 354–380.
-- Baumeister, R.F. et al. (1998). Ego depletion. *J. Personality and Social Psychology*, 74(5).
-- Sweller, J. (1988). Cognitive Load Theory. *Cognitive Science*, 12(2), 257–285.
+
+- Ebbinghaus, H. (1885). _Über das Gedächtnis_ — the Forgetting Curve.
+- Cepeda, N.J. et al. (2006). _Distributed Practice in Verbal Recall Tasks_. _Psychological Bulletin_, 132(3), 354–380.
+- Baumeister, R.F. et al. (1998). Ego depletion. _J. Personality and Social Psychology_, 74(5).
+- Sweller, J. (1988). Cognitive Load Theory. _Cognitive Science_, 12(2), 257–285.
 - LSAC official LSAT information. <https://www.lsac.org/lsat>
 - r/LSAT community data; 7Sage analytics & study schedule.
 
 ## Appendix C — Core SPOVs
-1. **1–3 hours/day, sustained over months** yields the best retention and consistency — an app should *coach the student like an athlete*, not maximize daily hours.
+
+1. **1–3 hours/day, sustained over months** yields the best retention and consistency — an app should _coach the student like an athlete_, not maximize daily hours.
 2. **~2,500 questions over ~8–9 months** is the realistic minimum for mastery — volume and timeline are mathematically coupled; you cannot honestly shortcut either.

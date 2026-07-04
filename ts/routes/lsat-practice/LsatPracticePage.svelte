@@ -124,7 +124,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         return "dimmed";
     }
 
-    $: isCorrect = answered && card && chosen?.toUpperCase() === (card.answer ?? "").toUpperCase();
+    $: isCorrect =
+        answered && card && chosen?.toUpperCase() === (card.answer ?? "").toUpperCase();
     $: accuracy = totalCount ? Math.round((correctCount / totalCount) * 100) : 0;
     // Compact header title so the bar stays a single line on mobile.
     $: shortSection =
@@ -182,25 +183,86 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         <span class="title">{phase === "active" ? shortSection : "Practice"}</span>
         <div class="bar-right">
             {#if phase === "active"}
-                <span class="score" in:fade={{ duration: 250 }}>{correctCount}/{totalCount} · {accuracy}%</span>
+                <span class="score" in:fade={{ duration: 250 }}>
+                    {correctCount}/{totalCount} · {accuracy}%
+                </span>
             {/if}
             <span class="hg-slot" bind:this={slotEl}>
                 {#if phase === "active" && total}
-                    <span class="hourglass" title="Time remaining" in:fade={{ duration: 300, delay: 60 }}>
-                        <svg viewBox="0 0 40 60" width="20" height="30" aria-hidden="true">
+                    <span
+                        class="hourglass"
+                        title="Time remaining"
+                        in:fade={{ duration: 300, delay: 60 }}
+                    >
+                        <svg
+                            viewBox="0 0 40 60"
+                            width="20"
+                            height="30"
+                            aria-hidden="true"
+                        >
                             <defs>
-                                <clipPath id="topTri"><polygon points="7,7 33,7 20,29" /></clipPath>
-                                <clipPath id="botTri"><polygon points="20,31 33,53 7,53" /></clipPath>
+                                <clipPath id="topTri">
+                                    <polygon points="7,7 33,7 20,29" />
+                                </clipPath>
+                                <clipPath id="botTri">
+                                    <polygon points="20,31 33,53 7,53" />
+                                </clipPath>
                             </defs>
-                            <rect x="7" y={topY} width="26" height={topH} fill="#e7c66b" clip-path="url(#topTri)" />
-                            <rect x="7" y={botY} width="26" height={botH} fill="#e7c66b" clip-path="url(#botTri)" />
+                            <rect
+                                x="7"
+                                y={topY}
+                                width="26"
+                                height={topH}
+                                fill="#e7c66b"
+                                clip-path="url(#topTri)"
+                            />
+                            <rect
+                                x="7"
+                                y={botY}
+                                width="26"
+                                height={botH}
+                                fill="#e7c66b"
+                                clip-path="url(#botTri)"
+                            />
                             {#if frac > 0 && frac < 1}
-                                <rect x="19.2" y="29" width="1.6" height="2" fill="#e7c66b" />
+                                <rect
+                                    x="19.2"
+                                    y="29"
+                                    width="1.6"
+                                    height="2"
+                                    fill="#e7c66b"
+                                />
                             {/if}
-                            <polygon points="7,7 33,7 20,29" fill="none" stroke="#f6edda" stroke-width="1.6" />
-                            <polygon points="20,31 33,53 7,53" fill="none" stroke="#f6edda" stroke-width="1.6" />
-                            <line x1="5" y1="7" x2="35" y2="7" stroke="#f6edda" stroke-width="2.2" stroke-linecap="round" />
-                            <line x1="5" y1="53" x2="35" y2="53" stroke="#f6edda" stroke-width="2.2" stroke-linecap="round" />
+                            <polygon
+                                points="7,7 33,7 20,29"
+                                fill="none"
+                                stroke="#f6edda"
+                                stroke-width="1.6"
+                            />
+                            <polygon
+                                points="20,31 33,53 7,53"
+                                fill="none"
+                                stroke="#f6edda"
+                                stroke-width="1.6"
+                            />
+                            <line
+                                x1="5"
+                                y1="7"
+                                x2="35"
+                                y2="7"
+                                stroke="#f6edda"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                            />
+                            <line
+                                x1="5"
+                                y1="53"
+                                x2="35"
+                                y2="53"
+                                stroke="#f6edda"
+                                stroke-width="2.2"
+                                stroke-linecap="round"
+                            />
                         </svg>
                         <span class="clock">{fmtTime(secondsLeft)}</span>
                     </span>
@@ -212,8 +274,18 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     <main class="stage">
         {#if phase !== "active"}
             <div class="intro">
-                <div class="flyer" class:flying={phase === "flying"} bind:this={flyerEl}>
-                    <svg class="hg" viewBox="0 0 80 120" width="140" height="205" aria-hidden="true">
+                <div
+                    class="flyer"
+                    class:flying={phase === "flying"}
+                    bind:this={flyerEl}
+                >
+                    <svg
+                        class="hg"
+                        viewBox="0 0 80 120"
+                        width="140"
+                        height="205"
+                        aria-hidden="true"
+                    >
                         <defs>
                             <linearGradient id="hgSand" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0" stop-color="#f2c765" />
@@ -228,22 +300,68 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         <polygon points="14,106 66,106 40,62" fill="url(#hgSand)" />
                         <rect x="38.6" y="52" width="2.8" height="10" fill="#d99a2b" />
                         <polygon points="34,50 46,50 40,58" fill="url(#hgSand)" />
-                        <polygon points="14,14 66,14 40,58" fill="none" stroke="#8c1c2b" stroke-width="2.4" stroke-linejoin="round" />
-                        <polygon points="40,62 66,106 14,106" fill="none" stroke="#8c1c2b" stroke-width="2.4" stroke-linejoin="round" />
-                        <line x1="8" y1="14" x2="72" y2="14" stroke="#6e1423" stroke-width="4.5" stroke-linecap="round" />
-                        <line x1="8" y1="106" x2="72" y2="106" stroke="#6e1423" stroke-width="4.5" stroke-linecap="round" />
-                        <line x1="12" y1="14" x2="12" y2="106" stroke="#6e1423" stroke-width="3" stroke-linecap="round" />
-                        <line x1="68" y1="14" x2="68" y2="106" stroke="#6e1423" stroke-width="3" stroke-linecap="round" />
+                        <polygon
+                            points="14,14 66,14 40,58"
+                            fill="none"
+                            stroke="#8c1c2b"
+                            stroke-width="2.4"
+                            stroke-linejoin="round"
+                        />
+                        <polygon
+                            points="40,62 66,106 14,106"
+                            fill="none"
+                            stroke="#8c1c2b"
+                            stroke-width="2.4"
+                            stroke-linejoin="round"
+                        />
+                        <line
+                            x1="8"
+                            y1="14"
+                            x2="72"
+                            y2="14"
+                            stroke="#6e1423"
+                            stroke-width="4.5"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="8"
+                            y1="106"
+                            x2="72"
+                            y2="106"
+                            stroke="#6e1423"
+                            stroke-width="4.5"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="12"
+                            y1="14"
+                            x2="12"
+                            y2="106"
+                            stroke="#6e1423"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                        <line
+                            x1="68"
+                            y1="14"
+                            x2="68"
+                            y2="106"
+                            stroke="#6e1423"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
                     </svg>
                 </div>
                 <div class="intro-copy" class:hide={phase === "flying"}>
                     <h1>Ready to get started?</h1>
-                    <p class="lead">A 2-hour adaptive lesson, tuned to your weakest area.</p>
+                    <p class="lead">
+                        A 2-hour adaptive lesson, tuned to your weakest area.
+                    </p>
                     <button class="cta big" on:click={begin}>Begin lesson</button>
                     <p class="science">
-                        Focused study blocks of roughly two hours — long enough for
-                        deep work, short enough to stay ahead of fatigue — are a sweet spot for
-                        durable, long-term retention.
+                        Focused study blocks of roughly two hours — long enough for deep
+                        work, short enough to stay ahead of fatigue — are a sweet spot
+                        for durable, long-term retention.
                     </p>
                 </div>
             </div>
@@ -259,7 +377,8 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         You've cleared the questions due for now.
                     {/if}
                     {#if totalCount}
-                        This session: <b>{correctCount}/{totalCount}</b> correct ({accuracy}%).
+                        This session: <b>{correctCount}/{totalCount}</b>
+                        correct ({accuracy}%).
                     {/if}
                 </p>
                 <p class="hint">FSRS will bring these back when it's time to review.</p>
@@ -290,7 +409,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 {#if answered}
                     <div class="feedback" class:good={isCorrect} class:bad={!isCorrect}>
                         <div class="verdict">
-                            {isCorrect ? "Correct" : `Incorrect — answer is ${card.answer}`}
+                            {isCorrect
+                                ? "Correct"
+                                : `Incorrect — answer is ${card.answer}`}
                         </div>
                         {#if card.explanation}
                             <p class="explanation">{card.explanation}</p>
@@ -321,7 +442,12 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         background: var(--beige);
         color: var(--ink);
         font-size: 15px;
-        font-family: "Jost", -apple-system, "Segoe UI", system-ui, sans-serif;
+        font-family:
+            "Jost",
+            -apple-system,
+            "Segoe UI",
+            system-ui,
+            sans-serif;
         -webkit-font-smoothing: antialiased;
     }
 
@@ -427,19 +553,36 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         transform-origin: center center;
     }
     @keyframes hgidle {
-        0%, 100% { transform: rotate(-2.5deg); }
-        50% { transform: rotate(2.5deg); }
+        0%,
+        100% {
+            transform: rotate(-2.5deg);
+        }
+        50% {
+            transform: rotate(2.5deg);
+        }
     }
     .flyer.flying {
         animation: fly 1150ms cubic-bezier(0.6, 0.04, 0.24, 1) forwards;
     }
     @keyframes fly {
-        0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-        30% { transform: translate(0, 0) rotate(180deg) scale(1); opacity: 1; }
-        44% { transform: translate(0, 0) rotate(180deg) scale(1.07); opacity: 1; }
-        88% { opacity: 1; }
+        0% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+        }
+        30% {
+            transform: translate(0, 0) rotate(180deg) scale(1);
+            opacity: 1;
+        }
+        44% {
+            transform: translate(0, 0) rotate(180deg) scale(1.07);
+            opacity: 1;
+        }
+        88% {
+            opacity: 1;
+        }
         100% {
-            transform: translate(var(--dx, 0), var(--dy, -260px)) rotate(180deg) scale(var(--s, 0.15));
+            transform: translate(var(--dx, 0), var(--dy, -260px)) rotate(180deg)
+                scale(var(--s, 0.15));
             opacity: 0;
         }
     }
@@ -447,7 +590,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     .intro-copy {
         margin-top: 1.75rem;
         max-width: 30rem;
-        transition: opacity 300ms ease, transform 300ms ease;
+        transition:
+            opacity 300ms ease,
+            transform 300ms ease;
         h1 {
             font-size: 2rem;
             font-weight: 800;
@@ -522,7 +667,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         border: 2px solid var(--beige-deep);
         border-radius: 10px;
         background: var(--beige);
-        transition: border-color 120ms ease, background 120ms ease, transform 80ms ease;
+        transition:
+            border-color 120ms ease,
+            background 120ms ease,
+            transform 80ms ease;
 
         &:not(:disabled):hover {
             border-color: var(--maroon-bright);
@@ -598,7 +746,9 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 700;
         color: var(--beige);
         background: var(--maroon);
-        transition: background 120ms ease, transform 80ms ease;
+        transition:
+            background 120ms ease,
+            transform 80ms ease;
         &:hover {
             background: var(--maroon-bright);
             transform: translateY(-1px);
