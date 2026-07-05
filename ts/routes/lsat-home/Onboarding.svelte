@@ -146,11 +146,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             <div class="plan-preview">
                 <div>
                     <span class="pk">Daily</span>
-                     2 hours
+                    2 hours
                 </div>
                 <div>
                     <span class="pk">Length</span>
-                     8 months (~240 days)
+                    8 months (~240 days)
                 </div>
                 <div>
                     <span class="pk">Target date</span>

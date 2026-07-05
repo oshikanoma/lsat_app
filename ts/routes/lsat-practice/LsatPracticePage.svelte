@@ -128,12 +128,16 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         answered && card && chosen?.toUpperCase() === (card.answer ?? "").toUpperCase();
     $: accuracy = totalCount ? Math.round((correctCount / totalCount) * 100) : 0;
     // Compact header title so the bar stays a single line on mobile.
-    $: shortSection =
-        card?.section === "Logical Reasoning"
-            ? "LR"
-            : card?.section === "Reading Comprehension"
-              ? "RC"
-              : (card?.section ?? "Practice");
+    function compactSection(section: string | undefined): string {
+        if (section === "Logical Reasoning") {
+            return "LR";
+        }
+        if (section === "Reading Comprehension") {
+            return "RC";
+        }
+        return section ?? "Practice";
+    }
+    $: shortSection = compactSection(card?.section);
 
     async function begin(): Promise<void> {
         // Measure how far the big hourglass must travel to reach the corner slot.

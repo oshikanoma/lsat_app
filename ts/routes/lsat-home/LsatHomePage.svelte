@@ -286,11 +286,13 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             role="presentation"
             on:click={() => (confirmingLogout = false)}
         >
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
             <div
                 class="logout-card"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="logout-title"
+                tabindex="-1"
                 on:click|stopPropagation
             >
                 <h3 id="logout-title">Sign out?</h3>

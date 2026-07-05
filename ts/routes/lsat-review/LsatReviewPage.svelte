@@ -61,7 +61,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 <p>
                     No vocab due right now.
                     {#if reviewed}You reviewed <b>{reviewed}</b>
-                         this session.{/if}
+                        this session.{/if}
                 </p>
                 <p class="hint">FSRS will resurface these when it's time.</p>
                 <button class="cta" on:click={exit}>Back to home</button>

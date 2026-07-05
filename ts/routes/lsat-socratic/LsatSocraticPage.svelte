@@ -54,7 +54,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     let transcribing = false;
     let speaking = false;
     let mediaRecorder: MediaRecorder | null = null;
-    let recordedChunks: BlobPart[] = [];
+    let recordedChunks: Blob[] = [];
     let micStream: MediaStream | null = null;
     let currentAudio: HTMLAudioElement | null = null;
 
@@ -221,10 +221,18 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     }
 
     function fileNameFor(mime: string): string {
-        if (mime.includes("ogg")) return "speech.ogg";
-        if (mime.includes("mp4") || mime.includes("m4a")) return "speech.mp4";
-        if (mime.includes("wav")) return "speech.wav";
-        if (mime.includes("mpeg") || mime.includes("mp3")) return "speech.mp3";
+        if (mime.includes("ogg")) {
+            return "speech.ogg";
+        }
+        if (mime.includes("mp4") || mime.includes("m4a")) {
+            return "speech.mp4";
+        }
+        if (mime.includes("wav")) {
+            return "speech.wav";
+        }
+        if (mime.includes("mpeg") || mime.includes("mp3")) {
+            return "speech.mp3";
+        }
         return "speech.webm";
     }
 
@@ -731,10 +739,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 <div class="bubble bot">
                     <p class="lead">
                         The <b>flagged</b>
-                        choice below is wrong. Talk it through with me and I'll help you
-                        pin down exactly
+                        choice below is wrong. Talk it through with me and I'll help you pin
+                        down exactly
                         <b>why</b>
-                         — I may ask you to clarify.
+                        — I may ask you to clarify.
                     </p>
                     {#if q.stimulus}
                         <button
@@ -828,13 +836,13 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         <div class="voice-status" class:rec={recording}>
                             {#if recording}
                                 <span class="pulse"></span>
-                                 Listening… tap the mic when you're done
+                                Listening… tap the mic when you're done
                             {:else if transcribing}
                                 <span class="spin"></span>
-                                 Transcribing what you said…
+                                Transcribing what you said…
                             {:else}
                                 <span class="pulse soft"></span>
-                                 Tutor is speaking…
+                                Tutor is speaking…
                             {/if}
                         </div>
                     {/if}
@@ -1361,10 +1369,6 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         }
         &.bad {
             border-color: var(--red);
-        }
-        .model {
-            margin: 0 0 1rem;
-            line-height: 1.55;
         }
     }
 
