@@ -4,10 +4,11 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
 -->
 <script lang="ts">
     import { bridgeCommand, bridgeCommandsAvailable } from "@tslib/bridgecommand";
-    import { onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount, tick } from "svelte";
     import { fade, fly } from "svelte/transition";
     import { cubicOut, backOut } from "svelte/easing";
     import Onboarding from "./Onboarding.svelte";
+    import Walkthrough from "./Walkthrough.svelte";
 
     type Score = {
         available: boolean;
@@ -110,6 +111,14 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         setTimeout(refresh, 1500);
     }
 
+    // Sign-in from the login gate. Unlike a plain sync, this keeps each account
+    // isolated on the device: a different account pulls its own data instead of
+    // merging/uploading whatever progress is already stored locally.
+    async function signIn(): Promise<void> {
+        await call("lsat:signin");
+        setTimeout(refresh, 1500);
+    }
+
     let confirmingLogout = false;
 
     async function logout(): Promise<void> {
@@ -125,6 +134,22 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     async function confirmLogout(): Promise<void> {
         confirmingLogout = false;
         await logout();
+    }
+
+    // Wipe this account's progress everywhere (this device AND the account on
+    // AnkiWeb) and start completely fresh. Used to clean up an account whose
+    // data got mixed up, or to reset for a from-scratch demo.
+    async function resetAll(): Promise<void> {
+        confirmingLogout = false;
+        await call("lsat:reset");
+        view = "hub";
+        showShop = false;
+        openScore = null;
+        viewInit = false;
+        // The wipe + clean upload runs on a background thread; refresh a couple
+        // of times so the UI reflects the fresh (onboarding) state once done.
+        setTimeout(refresh, 1500);
+        setTimeout(refresh, 3500);
     }
 
     async function buyUpgrade(id: string): Promise<void> {
@@ -144,6 +169,52 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
     function toHub(): void {
         view = "hub";
         showShop = false;
+    }
+
+    // First-run guided tour of the homebase. Each step points at a real
+    // element on the menu screen by CSS selector.
+    let showTour = false;
+    const TOUR_STEPS = [
+        {
+            sel: ".homebase",
+            title: "This is your homebase",
+            body: "Tap the little house anytime to come back here. It's your launchpad — every part of your prep is one tap away.",
+        },
+        {
+            sel: ".homebar",
+            title: "Make it your own",
+            body: "The coins you earn buy upgrades for your homebase — gardens, lanterns, even an aurora sky. Small rewards that make the daily grind feel like somewhere you want to be.",
+        },
+        {
+            sel: ".lesson-cta",
+            title: "Your daily 2-hour lesson",
+            body: "This is the heart of it. Each day is one focused 2-hour session — and that cap is the whole point. Short, deliberate reps beat marathon cram sessions, so the timer protects your learning instead of grinding you down. Every correct answer earns 100 coins.",
+            emphasis: true,
+        },
+        {
+            sel: ".socratic-cta",
+            title: "The Socratic Station",
+            body: "Hop on the train to explain out loud why a wrong answer is wrong. Saying your reasoning aloud — not just clicking a choice — is what forces real understanding to stick (and it's worth 500 coins a time).",
+        },
+        {
+            sel: ".dashboard",
+            title: "Three honest scores",
+            body: "Memory, Performance, and Readiness — each shown as a range, never a fake single number. We only reveal a score once there's enough data to trust it, and always point you to the single best thing to study next.",
+        },
+    ];
+
+    async function startTour(): Promise<void> {
+        view = "menu";
+        showShop = false;
+        await tick();
+        // Let the menu's fly-in transitions land before we measure targets.
+        setTimeout(() => (showTour = true), 420);
+    }
+
+    async function onOnboardDone(detail: HomeState): Promise<void> {
+        state = detail;
+        viewInit = true;
+        await startTour();
     }
 
     function niceDate(iso: string): string {
@@ -268,6 +339,16 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                     <span class="coin-icon" aria-hidden="true"></span>
                     {coins.toLocaleString()}
                 </span>
+                {#if onboarded}
+                    <button
+                        class="help"
+                        on:click={startTour}
+                        title="Replay the walkthrough"
+                        aria-label="Replay the walkthrough"
+                    >
+                        ?
+                    </button>
+                {/if}
                 <button class="sync on" on:click={sync}>Synced</button>
                 <button
                     class="mini"
@@ -313,6 +394,13 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         Sign out
                     </button>
                 </div>
+                <button
+                    class="reset-link"
+                    on:click={resetAll}
+                    title="Erase this account's progress everywhere and start fresh"
+                >
+                    Reset &amp; start over
+                </button>
             </div>
         </div>
     {/if}
@@ -322,7 +410,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             <div class="gate-card">
                 <span class="gate-brand">homebase.</span>
                 <p class="gate-tag">Your LSAT prep, synced across every device.</p>
-                <button class="gate-btn" on:click={sync}>Sign in to begin</button>
+                <button class="gate-btn" on:click={signIn}>Sign in to begin</button>
                 <p class="gate-note">
                     Sign in with your AnkiWeb account. Your progress lives on the
                     account and syncs across every device, so you'll pick up right where
@@ -331,7 +419,7 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             </div>
         </section>
     {:else if state && !onboarded}
-        <Onboarding on:done={(e) => (state = e.detail)} />
+        <Onboarding on:done={(e) => onOnboardDone(e.detail)} />
     {:else}
         <main
             class="stage"
@@ -1230,31 +1318,142 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                         </div>
                     </section>
 
-                    <!-- Adaptive timed lesson: the main event -->
-                    <button
-                        class="lesson-cta"
-                        on:click={startLesson}
-                        in:fly={{ y: 24, duration: 500, delay: 250, easing: backOut }}
-                    >
-                        <span class="lesson-title">Start lesson</span>
-                        <span class="lesson-blurb">
-                            A 2-hour timed session that adapts to your weakest area ·
-                            100 coins per correct answer
-                        </span>
-                    </button>
+                    <!-- Lesson + Socratic: two big icon tiles, side by side -->
+                    <div class="cta-row">
+                        <!-- Adaptive timed lesson: the main event -->
+                        <button
+                            class="lesson-cta"
+                            on:click={startLesson}
+                            in:fly={{
+                                y: 24,
+                                duration: 500,
+                                delay: 250,
+                                easing: backOut,
+                            }}
+                        >
+                            <span class="cta-icon" aria-hidden="true">
+                                <!-- classroom: a chalkboard on an easel -->
+                                <svg class="cta-svg" viewBox="0 0 48 48">
+                                    <rect
+                                        x="8"
+                                        y="7"
+                                        width="32"
+                                        height="23"
+                                        rx="2.5"
+                                        fill="#4a0d18"
+                                        stroke="#f6edda"
+                                        stroke-width="2.4"
+                                    />
+                                    <path
+                                        d="M13 24 L20 19 L27 22 L35 13"
+                                        fill="none"
+                                        stroke="#e0a83a"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                    <rect
+                                        x="10"
+                                        y="30"
+                                        width="28"
+                                        height="2.6"
+                                        rx="1.3"
+                                        fill="#f6edda"
+                                    />
+                                    <path
+                                        d="M14 32 L10 42 M34 32 L38 42 M24 32 L24 42"
+                                        stroke="#f6edda"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                    />
+                                </svg>
+                            </span>
+                            <span class="lesson-title">Start lesson</span>
+                            <span class="cta-meta">2 hours · 100 coins / correct</span>
+                        </button>
 
-                    <!-- Socratic Station -->
-                    <button
-                        class="socratic-cta"
-                        on:click={openSocratic}
-                        in:fly={{ y: 24, duration: 500, delay: 320, easing: backOut }}
-                    >
-                        <span class="lesson-title">Socratic Station</span>
-                        <span class="lesson-blurb">
-                            Explain why a wrong answer is wrong · 500 coins per correct
-                            explanation · open anytime
-                        </span>
-                    </button>
+                        <!-- Socratic Station -->
+                        <button
+                            class="socratic-cta"
+                            on:click={openSocratic}
+                            in:fly={{
+                                y: 24,
+                                duration: 500,
+                                delay: 320,
+                                easing: backOut,
+                            }}
+                        >
+                            <span class="cta-icon" aria-hidden="true">
+                                <!-- the same little train from the arrival animation -->
+                                <svg class="cta-svg" viewBox="0 0 48 48">
+                                    <rect
+                                        x="5"
+                                        y="38"
+                                        width="38"
+                                        height="2.4"
+                                        rx="1.2"
+                                        fill="#6e1423"
+                                        opacity="0.35"
+                                    />
+                                    <rect
+                                        x="27"
+                                        y="10"
+                                        width="5"
+                                        height="9"
+                                        rx="1.5"
+                                        fill="#4a0d18"
+                                    />
+                                    <circle
+                                        cx="29.5"
+                                        cy="7"
+                                        r="2.4"
+                                        fill="#6e1423"
+                                        opacity="0.3"
+                                    />
+                                    <rect
+                                        x="7"
+                                        y="15"
+                                        width="30"
+                                        height="5"
+                                        rx="2"
+                                        fill="#4a0d18"
+                                    />
+                                    <rect
+                                        x="9"
+                                        y="18"
+                                        width="26"
+                                        height="16"
+                                        rx="3"
+                                        fill="#6e1423"
+                                    />
+                                    <rect
+                                        x="13"
+                                        y="21"
+                                        width="9"
+                                        height="8"
+                                        rx="1.5"
+                                        fill="#e0a83a"
+                                    />
+                                    <rect
+                                        x="35"
+                                        y="22"
+                                        width="6"
+                                        height="12"
+                                        rx="2"
+                                        fill="#8c1c2b"
+                                    />
+                                    <circle cx="16" cy="35" r="4" fill="#4a0d18" />
+                                    <circle cx="30" cy="35" r="4" fill="#4a0d18" />
+                                    <circle cx="16" cy="35" r="1.5" fill="#f6edda" />
+                                    <circle cx="30" cy="35" r="1.5" fill="#f6edda" />
+                                </svg>
+                            </span>
+                            <span class="lesson-title">Socratic Station</span>
+                            <span class="cta-meta">
+                                Talk it out · 500 coins / correct
+                            </span>
+                        </button>
+                    </div>
 
                     <!-- Scores -->
                     <section
@@ -1380,6 +1579,10 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
                 </div>
             {/if}
         </main>
+    {/if}
+
+    {#if showTour}
+        <Walkthrough steps={TOUR_STEPS} on:done={() => (showTour = false)} />
     {/if}
 </div>
 
@@ -1559,6 +1762,22 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
             border-color: var(--beige);
         }
     }
+    .help {
+        width: 1.9rem;
+        height: 1.9rem;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        border: 1px solid rgba(246, 237, 218, 0.5);
+        color: var(--beige);
+        font-weight: 800;
+        font-size: 0.95rem;
+        line-height: 1;
+        transition: background 120ms ease;
+        &:hover {
+            background: rgba(246, 237, 218, 0.12);
+        }
+    }
     .mini {
         padding: 0.4rem 0.7rem;
         border: 1px solid rgba(246, 237, 218, 0.35);
@@ -1698,6 +1917,23 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         &:hover {
             background: var(--maroon-bright);
             transform: translateY(-1px);
+        }
+    }
+    .reset-link {
+        display: block;
+        margin: 1rem auto 0;
+        padding: 0.3rem 0.4rem;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 0.78rem;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        cursor: pointer;
+        opacity: 0.75;
+        &:hover {
+            color: var(--maroon);
+            opacity: 1;
         }
     }
 
@@ -1989,66 +2225,84 @@ License: GNU AGPL, version 3 or later; http://www.gnu.org/licenses/agpl.html
         font-weight: 800;
     }
 
-    .lesson-cta {
+    /* Two big icon tiles, side by side */
+    .cta-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .cta-icon {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: 6rem;
+        height: 6rem;
+        border-radius: 20px;
+    }
+    .cta-svg {
+        width: 5rem;
+        height: 5rem;
+        display: block;
+    }
+    .cta-meta {
+        font-size: 0.82rem;
+        font-weight: 600;
+        opacity: 0.85;
+    }
+
+    .lesson-cta,
+    .socratic-cta {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 0.3rem;
-        width: 100%;
-        padding: 1.6rem 1.5rem;
-        text-align: left;
-        border-radius: 16px;
-        color: var(--beige);
-        background: var(--maroon);
-        box-shadow: 0 10px 26px rgba(74, 13, 24, 0.22);
-        margin-bottom: 1.25rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.85rem;
+        min-width: 0;
+        padding: 1.9rem 1.25rem;
+        text-align: center;
+        border-radius: 18px;
         transition:
             background 120ms ease,
             transform 120ms ease,
             box-shadow 120ms ease;
         &:hover {
-            background: #7f2230;
             transform: translateY(-2px);
-            box-shadow: 0 14px 32px rgba(74, 13, 24, 0.3);
         }
         .lesson-title {
             font-weight: 800;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
+            line-height: 1.1;
         }
-        .lesson-blurb {
-            opacity: 0.88;
-            font-size: 0.9rem;
+    }
+
+    .lesson-cta {
+        color: var(--beige);
+        background: var(--maroon);
+        box-shadow: 0 10px 26px rgba(74, 13, 24, 0.22);
+        &:hover {
+            background: #7f2230;
+            box-shadow: 0 14px 32px rgba(74, 13, 24, 0.3);
+        }
+        .cta-icon {
+            background: rgba(246, 237, 218, 0.12);
+            border: 1px solid rgba(246, 237, 218, 0.28);
         }
     }
 
     .socratic-cta {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.3rem;
-        width: 100%;
-        padding: 1.3rem 1.5rem;
-        text-align: left;
-        border-radius: 16px;
         color: var(--maroon-deep);
         background: var(--beige-deep);
         border: 2px solid var(--maroon);
-        margin-bottom: 1.5rem;
-        transition:
-            background 120ms ease,
-            transform 120ms ease;
         &:hover {
             background: #e6d6b3;
-            transform: translateY(-2px);
+        }
+        .cta-icon {
+            background: var(--beige);
+            border: 1px solid rgba(110, 20, 35, 0.2);
         }
         .lesson-title {
-            font-weight: 800;
-            font-size: 1.35rem;
             color: var(--maroon-deep);
-        }
-        .lesson-blurb {
-            opacity: 0.9;
-            font-size: 0.88rem;
         }
     }
 

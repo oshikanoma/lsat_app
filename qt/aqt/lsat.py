@@ -281,8 +281,17 @@ def _sync_soon() -> None:
         return
 
     def _go() -> None:
+        global _SYNC_PENDING
         try:
-            _run_quiet_sync(mw)
+            # Only sync while the collection is idle on the home screen. Coins are
+            # earned on the lesson/Socratic sub-pages, where the main thread is
+            # actively writing answers to the collection; a background sync there
+            # races those writes and can crash the backend. Defer instead: mark a
+            # pending sync that drains the moment the user returns home.
+            if mw.state == "lsatHome":
+                _run_quiet_sync(mw)
+            else:
+                _SYNC_PENDING = True
         except Exception:
             pass
 
@@ -300,6 +309,10 @@ _AUTO_SYNC_INTERVAL_MS = 25_000
 _AUTO_SYNC_TIMER: QTimer | None = None
 _AUTO_SYNC_INSTALLED = False
 _SYNC_ACTIVE = False
+# Set when a coin-earning action happens off the home screen (e.g. mid-lesson):
+# the upload is deferred until the user returns home, where the collection is
+# idle, so it can't race the answer writes on a sub-page.
+_SYNC_PENDING = False
 # The collection mod-time reflected by the currently displayed home screen, so a
 # sync only reloads the page when something actually changed (no flashing).
 _LAST_HOME_MOD: int | None = None
@@ -350,15 +363,21 @@ def _auto_sync_tick(mw: aqt.AnkiQt) -> None:
 
 
 def _redraw_home_if_changed(mw: aqt.AnkiQt) -> None:
-    """Redraw the LSAT home screen if a sync changed the collection, so freshly
-    pulled data (coins, name, stats…) appears immediately. No-op elsewhere."""
+    """Note that a background sync changed the collection.
+
+    We deliberately DON'T reload the page here. The home screen polls
+    ``lsat:home`` every few seconds and updates in place, so freshly pulled data
+    (coins, name, stats…) appears on its own. A full ``moveToState`` reload would
+    remount the SvelteKit app mid-interaction — resetting the onboarding
+    walkthrough, the current view and scroll position — which is exactly the
+    kind of accidental interruption we want to avoid (mirrors the mobile fix of
+    not reloading the WebView on background syncs)."""
     if mw.state == "lsatHome" and mw.col is not None:
         try:
-            changed = mw.col.mod != _LAST_HOME_MOD
+            global _LAST_HOME_MOD
+            _LAST_HOME_MOD = mw.col.mod
         except Exception:
-            changed = True
-        if changed:
-            mw.moveToState("lsatHome")
+            pass
 
 
 def _run_quiet_sync(mw: aqt.AnkiQt) -> None:
@@ -406,6 +425,11 @@ def _run_quiet_sync(mw: aqt.AnkiQt) -> None:
 def _home_payload(mw: aqt.AnkiQt) -> dict[str, Any]:
     """Everything the home screen needs, delivered over the JS bridge."""
     col = mw.col
+    # If we're signed in but never recorded who owns this device's data (e.g.
+    # a session that predates account isolation), adopt the current account now
+    # so a later switch to a different account is correctly detected.
+    if mw.pm.sync_auth() is not None and not _local_data_owner(mw):
+        _set_local_data_owner(mw, _current_sync_username(mw))
     # Remember the collection state this render reflects, so the foreground
     # auto-sync only reloads the page when a later sync actually changes it.
     global _LAST_HOME_MOD
@@ -471,20 +495,23 @@ def _sign_out(mw: aqt.AnkiQt) -> None:
     homebase upgrades, vocab + FSRS mastery, stats) stays in the collection and
     on the account, and reappears on the next sign-in. Any changes not yet
     uploaded simply stay in the local collection and re-sync on the next login.
+
+    Account isolation happens on the *next* sign-in (see `_sign_in`): if a
+    different account signs in, that device's leftover data is replaced with the
+    new account's own collection instead of being merged/uploaded into it.
     """
     mw.pm.clear_sync_auth()
     global _ENGAGED_THIS_RUN
     _ENGAGED_THIS_RUN = False
 
 
-def _reset_demo(mw: aqt.AnkiQt) -> None:
-    """Wipe local LSAT progress so the app can be demoed from scratch.
+def _wipe_local_lsat(col: Collection) -> None:
+    """Delete all LSAT progress from the local collection.
 
-    Clears onboarding/profile, coins + homebase upgrades, practice history and
-    vocabulary, removes the LSAT decks and their cards (resetting FSRS/Memory),
-    and signs out of AnkiWeb. Data already synced to the server is untouched.
+    Removes the LSAT decks and their cards (resetting FSRS/Memory) plus every
+    LSAT config blob (profile, coins + homebase, practice history, vocab). Does
+    NOT touch the AnkiWeb session — callers decide whether to also sign out.
     """
-    col = mw.col
     for deck_name in (
         VOCAB_DECK,
         PRACTICE_DECKS["lr"],
@@ -507,9 +534,181 @@ def _reset_demo(mw: aqt.AnkiQt) -> None:
         _CFG_PRACTICE_IMPORTED,
     ):
         col.remove_config(key)
+
+
+def _reset_demo(mw: aqt.AnkiQt) -> None:
+    """Wipe local LSAT progress so the app can be demoed from scratch.
+
+    Clears onboarding/profile, coins + homebase upgrades, practice history and
+    vocabulary, removes the LSAT decks and their cards (resetting FSRS/Memory),
+    and signs out of AnkiWeb. Data already synced to the server is untouched.
+    """
+    _wipe_local_lsat(mw.col)
+    _set_local_data_owner(mw, "")
     mw.pm.clear_sync_auth()
     global _ENGAGED_THIS_RUN
     _ENGAGED_THIS_RUN = False
+
+
+# --- account isolation on sign-in ------------------------------------------
+#
+# One device holds a single local collection, but users may sign in and out of
+# different AnkiWeb accounts on it. Without care, a normal sync would merge (or,
+# for a brand-new account, upload) the previous account's leftover progress into
+# whichever account just signed in — cross-contaminating them. We record which
+# account currently "owns" the local data (per-device, never synced) and, when a
+# *different* account signs in, replace the local data with that account's own
+# collection instead of pushing this device's data up.
+
+_OWNER_KEY = "lsatDataOwner"
+
+
+def _local_data_owner(mw: aqt.AnkiQt) -> str:
+    """The AnkiWeb account whose LSAT data currently lives on this device."""
+    return (mw.pm.profile.get(_OWNER_KEY) or "").strip().lower()
+
+
+def _set_local_data_owner(mw: aqt.AnkiQt, username: str) -> None:
+    mw.pm.profile[_OWNER_KEY] = (username or "").strip().lower()
+
+
+def _current_sync_username(mw: aqt.AnkiQt) -> str:
+    return (mw.pm.profile.get("syncUser") or "").strip().lower()
+
+
+def _refresh_home(mw: aqt.AnkiQt) -> None:
+    mw.toolbar.redraw()
+    if mw.state == "lsatHome" and mw.col is not None:
+        mw.moveToState("lsatHome")
+
+
+def _sign_in(mw: aqt.AnkiQt) -> None:
+    """Sign in to AnkiWeb, keeping each account's data isolated on this device.
+
+    Returning to the SAME account this device already holds data for does a
+    normal two-way sync (progress merges as before). Signing into a DIFFERENT
+    account never uploads this device's existing progress into it: we pull that
+    account's own collection instead, or — for a brand-new empty account — start
+    from a clean slate, so accounts can't cross-contaminate.
+    """
+    from aqt.sync import sync_login
+
+    if mw.pm.sync_auth() is None:
+        sync_login(mw, lambda: _login_sync(mw))
+    else:
+        _login_sync(mw)
+
+
+def _login_sync(mw: aqt.AnkiQt) -> None:
+    from aqt import sync as syncmod
+
+    auth = mw.pm.sync_auth()
+    if auth is None or mw.col is None:
+        _refresh_home(mw)
+        return
+
+    username = _current_sync_username(mw)
+    owner = _local_data_owner(mw)
+    switching = bool(owner) and owner != username
+
+    def on_done() -> None:
+        _set_local_data_owner(mw, username)
+        _refresh_home(mw)
+
+    def after_check(fut: Any) -> None:
+        mw.col._load_scheduler()
+        try:
+            out = fut.result()
+        except Exception as err:
+            syncmod.handle_sync_error(mw, err)
+            _refresh_home(mw)
+            return
+        mw.pm.set_host_number(out.host_number)
+        if out.new_endpoint:
+            mw.pm.set_current_sync_url(out.new_endpoint)
+        server_usn = out.server_media_usn if mw.pm.media_syncing_enabled() else None
+        req = out.required
+        if req == out.NO_CHANGES:
+            on_done()
+        elif req == out.FULL_DOWNLOAD:
+            syncmod.full_download(mw, server_usn, on_done)
+        elif req == out.FULL_UPLOAD:
+            if switching:
+                # A different (empty) account: don't seed it with this device's
+                # leftover progress — start it from a clean slate.
+                _wipe_local_lsat(mw.col)
+            syncmod.full_upload(mw, server_usn, on_done)
+        elif switching:
+            # Diverged AND switching accounts: take the account's copy; never
+            # push this device's other-account data up.
+            syncmod.full_download(mw, server_usn, on_done)
+        else:
+            # Same account, genuine conflict: let the user choose as usual.
+            syncmod.full_sync(mw, out, on_done)
+
+    mw.taskman.with_progress(
+        lambda: mw.col.sync_collection(auth, mw.pm.media_syncing_enabled()),
+        after_check,
+        label="Signing in…",
+        title="Signing in…",
+        immediate=True,
+    )
+
+
+def _reset_account(mw: aqt.AnkiQt) -> None:
+    """Erase this account's LSAT progress everywhere and start fresh.
+
+    Wipes the local collection and, if signed in, replaces the account's copy on
+    AnkiWeb with the clean state via a full upload — so a mixed-up account can be
+    cleaned, or the app reset for a from-scratch demo, on both this device and
+    the account. The user stays signed in; the home screen falls back to
+    onboarding on the now-empty collection.
+    """
+    if mw.col is None:
+        return
+    _wipe_local_lsat(mw.col)
+    global _ENGAGED_THIS_RUN
+    _ENGAGED_THIS_RUN = False
+
+    auth = mw.pm.sync_auth()
+    if auth is None:
+        _set_local_data_owner(mw, "")
+        _refresh_home(mw)
+        return
+
+    from aqt import sync as syncmod
+
+    def on_done() -> None:
+        # The clean collection now belongs to the signed-in account.
+        _set_local_data_owner(mw, _current_sync_username(mw))
+        _refresh_home(mw)
+
+    def after_check(fut: Any) -> None:
+        # A normal sync check first, so the server endpoint + media USN are
+        # populated (a fresh login hasn't discovered the redirect URL yet, and
+        # jumping straight to a full upload would send to an empty URL).
+        mw.col._load_scheduler()
+        try:
+            out = fut.result()
+        except Exception as err:
+            syncmod.handle_sync_error(mw, err)
+            _refresh_home(mw)
+            return
+        mw.pm.set_host_number(out.host_number)
+        if out.new_endpoint:
+            mw.pm.set_current_sync_url(out.new_endpoint)
+        server_usn = out.server_media_usn if mw.pm.media_syncing_enabled() else None
+        # Force-replace the account's copy with this clean state, whatever the
+        # check recommends.
+        syncmod.full_upload(mw, server_usn, on_done)
+
+    mw.taskman.with_progress(
+        lambda: mw.col.sync_collection(auth, mw.pm.media_syncing_enabled()),
+        after_check,
+        label="Resetting…",
+        title="Resetting…",
+        immediate=True,
+    )
 
 
 def _start_vocab_review(mw: aqt.AnkiQt) -> None:
@@ -541,6 +740,12 @@ class LsatHome:
         # Keep the home screen live: pull from AnkiWeb periodically so changes
         # from another device appear on their own (installed once).
         _install_auto_sync(self.mw)
+        # Drain any sync deferred while the user was mid-lesson: now that the
+        # collection is idle on the home screen, uploading is safe.
+        global _SYNC_PENDING
+        if _SYNC_PENDING:
+            _SYNC_PENDING = False
+            _sync_soon()
 
     def _on_cmd(self, cmd: str) -> Any:  # noqa: PLR0911
         mw = self.mw
@@ -558,6 +763,17 @@ class LsatHome:
             return _home_payload(mw)
         if cmd == "lsat:vocab:review":
             mw.moveToState("lsatReview")
+            return True
+        if cmd == "lsat:signin":
+            # Account-isolated sign-in from the login gate: pulls this account's
+            # own data rather than merging/uploading whatever's already here.
+            _sign_in(mw)
+            return True
+        if cmd == "lsat:reset":
+            # Erase this account's progress on the device AND on AnkiWeb, then
+            # start fresh. Confirmation is handled in the shared UI. The clean
+            # state is pushed on a background thread, so the UI just refreshes.
+            _reset_account(mw)
             return True
         if cmd == "lsat:sync":
             mw.on_sync_button_clicked()
